@@ -11,7 +11,7 @@
 
 ## Жёсткие ограничения
 
-- Чистый HTML + CSS + JS. Без Node, сборщиков, фреймворков и JS-библиотек. Один `index.html` со встроенными `<style>` и `<script>` + папка `images/`. Из внешнего только Google Fonts и встраивание YouTube.
+- Чистый HTML + CSS + JS. Без Node, сборщиков, фреймворков и JS-библиотек. Один `index.html` со встроенными `<style>` и `<script>` + папка `images/`. Из внешнего только Google Fonts, встраивание YouTube и скрипт Cloudflare Web Analytics перед `</body>` (токен `7250131e586a433d928b5f846a6621ec`).
 - Хостинг: GitHub Pages, репозиторий `bilol-art/bilol-art.github.io`, домен `bilol.art` (Namecheap).
 - Файл `CNAME` в корне репозитория не трогать и не удалять никогда. Без него домен отвяжется.
 - DNS и почта hello@bilol.art (Zoho) уже настроены, их не трогать.
@@ -244,7 +244,7 @@
 - Фотограф: Giper Photo Uz (ноябрь 2025 – апрель 2026, события и семейные съёмки), Magic Studio Uz (август – октябрь 2025, школьные портреты и выпускные альбомы).
 - Ведущий колорист, Zo'r TV, декабрь 2021 – сентябрь 2022: сериалы и шоу для национального эфира, многокамерные проекты, эфирные стандарты.
 - Сертификаты:
-  - Blackmagic Design: The Colorist Guide to DaVinci Resolve 18 (2025), The Editor's Guide to DaVinci Resolve 18 (2025), The Beginner's Guide to DaVinci Resolve 18 (2025);
+  - Blackmagic Design: The Colorist Guide to DaVinci Resolve 18 (2025), The Editor's Guide to DaVinci Resolve 18 (2025) (The Beginner's Guide владелец попросил убрать с сайта);
   - Makarov Studios: DaVinci Resolve Advanced Color Class (2021).
 - Образование на сайт не выносить.
 
@@ -277,7 +277,6 @@
 
 ## Позже
 
-- Код Cloudflare Web Analytics: владелец пришлёт одну строку, вставить перед `</body>`.
 - Уточнить у владельца строку с языками и названия трёх пар (сейчас описательные: «Солдат под дождём», «В воде», «Коридор»).
 - Спросить, оставлять ли в «Опыте» строку «Фотограф»: для зарубежных клиентов колориста съёмка событий и школьных альбомов скорее размывает позиционирование.
 
