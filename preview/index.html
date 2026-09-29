@@ -253,8 +253,11 @@ main > section.hero { margin-top: 0; }
 .w-range { position: absolute; left: 0; bottom: 0; width: 100%; height: 1px; margin: 0; opacity: 0; pointer-events: none; }
 .w-range:focus-visible + .w-inner .w-handle { box-shadow: 0 0 0 3px var(--accent), 0 4px 16px rgba(0,0,0,.3); }
 
-.stage { --ar: 2.39; aspect-ratio: var(--ar); width: min(100%, calc(min(78svh, 900px) * var(--ar))); box-shadow: var(--frame-shadow); }
-.stage.is-resizing { transition: width .45s var(--ease), height .45s var(--ease); }
+/* the frame and its panel share one width, capped so the scopes stay on screen while dragging */
+.ba { --ar: 1.78; width: min(100%, calc(clamp(360px, 100svh - 350px, 900px) * var(--ar))); container: ba / inline-size; }
+.ba.is-resizing { transition: width .45s var(--ease); }
+.stage { aspect-ratio: var(--ar); width: 100%; box-shadow: var(--frame-shadow); }
+.stage.is-resizing { transition: height .45s var(--ease); }
 .stage.is-fading .w-inner { opacity: 0; }
 
 .panel {
@@ -284,6 +287,11 @@ main > section.hero { margin-top: 0; }
   .scope.wave { flex: 1; min-width: 0; }
   .scope.wave canvas { width: 100%; }
 }
+@container ba (max-width: 820px) {
+  .panel { grid-template-columns: minmax(0, 1fr); }
+  .scope.wave { flex: 1; min-width: 0; }
+  .scope.wave canvas { width: 100%; }
+}
 @media (max-width: 640px) {
   :root { --r-frame: 14px; }
   .scope canvas { height: 92px; }
@@ -292,7 +300,7 @@ main > section.hero { margin-top: 0; }
 }
 
 /* justified rows */
-.rows { --row: clamp(130px, 20.8vw, 310px); display: flex; flex-wrap: wrap; gap: clamp(8px, .9vw, 14px); }
+.rows { --row: clamp(260px, 36vw, 560px); display: flex; flex-wrap: wrap; gap: clamp(8px, .9vw, 14px); }
 .tile { flex-grow: calc(var(--ar) * 100); flex-basis: calc(var(--ar) * var(--row)); max-width: calc(var(--ar) * var(--row) * 1.7); min-width: 0; }
 .tile-media {
   position: relative; display: block; width: 100%; aspect-ratio: var(--ar); padding: 0; border: 0;
@@ -330,7 +338,6 @@ main > section.hero { margin-top: 0; }
 .about-body { grid-area: body; margin-top: clamp(24px, 3vw, 40px); }
 .portrait { grid-area: portrait; position: relative; aspect-ratio: 4 / 5; border-radius: 28px; overflow: hidden; background: var(--wash), var(--surface); }
 .portrait img { width: 100%; height: 100%; }
-.portrait-ph { position: absolute; left: 24px; bottom: 22px; color: var(--faint); font-size: 14px; font-weight: 600; }
 .about-body p { max-width: 34em; font-size: clamp(18px, 1.45vw, 20px); line-height: 1.55; }
 .about-body p + p { margin-top: 18px; color: var(--muted); }
 .specs { display: grid; grid-template-columns: 1fr 1fr; gap: 24px 32px; margin-top: 40px; max-width: 44em; }
@@ -483,12 +490,12 @@ main > section.hero { margin-top: 0; }
   <section class="wrap" id="compare">
     <h2 class="h2"><span lang="en">Before and after</span><span lang="ru">До и после</span></h2>
     <p class="lead"><span lang="en">Drag across the frame. The scopes under it show what the grade does to brightness and color.</span><span lang="ru">Проведите по кадру. Скопы под ним показывают, что грейд делает с яркостью и цветом.</span></p>
-    <div class="sec-body">
-      <div class="wipe stage" id="stage" style="--ar:2.3904">
+    <div class="sec-body ba" id="ba" style="--ar:1.7778">
+      <div class="wipe stage" id="stage">
         <input class="w-range" type="range" min="0" max="100" step="1" value="0" data-aria-en="Before and after position" data-aria-ru="Положение шторки">
         <div class="w-inner">
-          <img class="w-before" src="../images/pairs/pair-1-before-1200.jpg" srcset="../images/pairs/pair-1-before-1200.jpg 1200w, ../images/pairs/pair-1-before.jpg 2400w" sizes="(max-width: 1440px) 100vw, 1360px" width="2400" height="1004" alt="" loading="lazy" decoding="async">
-          <img class="w-after" src="../images/pairs/pair-1-after-1200.jpg" srcset="../images/pairs/pair-1-after-1200.jpg 1200w, ../images/pairs/pair-1-after.jpg 2400w" sizes="(max-width: 1440px) 100vw, 1360px" width="2400" height="1004" alt="" loading="lazy" decoding="async">
+          <img class="w-before" src="../images/pairs/pair-1-before-1200.jpg" srcset="../images/pairs/pair-1-before-1200.jpg 1200w, ../images/pairs/pair-1-before.jpg 2400w" sizes="(max-width: 1440px) 100vw, 1360px" width="2400" height="1350" alt="" loading="lazy" decoding="async">
+          <img class="w-after" src="../images/pairs/pair-1-after-1200.jpg" srcset="../images/pairs/pair-1-after-1200.jpg 1200w, ../images/pairs/pair-1-after.jpg 2400w" sizes="(max-width: 1440px) 100vw, 1360px" width="2400" height="1350" alt="Soldier in the rain" loading="lazy" decoding="async">
           <span class="w-label lbl-after"><span lang="en">After</span><span lang="ru">После</span></span>
           <span class="w-label lbl-before"><span lang="en">Before</span><span lang="ru">До</span></span>
           <div class="w-line" aria-hidden="true"><span class="w-handle"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 6 3.5 10l4 4M12.5 6l4 4-4 4"/></svg></span></div>
@@ -500,9 +507,9 @@ main > section.hero { margin-top: 0; }
           <p class="pair-line"><span class="k"><span lang="en">Source</span><span lang="ru">Источник</span></span><span id="pairSource"></span></p>
           <p class="pair-line"><span class="k"><span lang="en">Before</span><span lang="ru">До</span></span><span lang="en">Normalized to Rec.709</span><span lang="ru">Нормализация в Rec.709</span></p>
           <div class="thumbs" id="thumbs">
-            <button type="button" class="thumb" style="--ar:2.3904" aria-pressed="true" data-before="../images/pairs/pair-1-before" data-after="../images/pairs/pair-1-after" data-w="2400" data-h="1004" data-ws="1200" data-title="Placeholder pair 1" data-title-ru="Заглушка, пара 1" data-meta="Placeholder frame, 2.39:1" data-meta-ru="Кадр-заглушка, 2.39:1"><img src="../images/pairs/pair-1-after-1200.jpg" width="1200" height="502" alt="" loading="lazy" decoding="async"></button>
-            <button type="button" class="thumb" style="--ar:1.7804" aria-pressed="false" data-before="../images/pairs/pair-2-before" data-after="../images/pairs/pair-2-after" data-w="2400" data-h="1348" data-ws="1200" data-title="Placeholder pair 2" data-title-ru="Заглушка, пара 2" data-meta="Placeholder frame, 16:9" data-meta-ru="Кадр-заглушка, 16:9"><img src="../images/pairs/pair-2-after-1200.jpg" width="1200" height="674" alt="" loading="lazy" decoding="async"></button>
-            <button type="button" class="thumb" style="--ar:0.8" aria-pressed="false" data-before="../images/pairs/pair-3-before" data-after="../images/pairs/pair-3-after" data-w="1920" data-h="2400" data-ws="960" data-title="Placeholder pair 3" data-title-ru="Заглушка, пара 3" data-meta="Placeholder frame, 4:5" data-meta-ru="Кадр-заглушка, 4:5"><img src="../images/pairs/pair-3-after-1200.jpg" width="960" height="1200" alt="" loading="lazy" decoding="async"></button>
+            <button type="button" class="thumb" style="--ar:1.7778" aria-pressed="true" data-before="../images/pairs/pair-1-before" data-after="../images/pairs/pair-1-after" data-w="2400" data-h="1350" data-ws="1200" data-title="Soldier in the rain" data-title-ru="Солдат под дождём" data-meta="RED Epic-X" data-meta-ru="RED Epic-X"><img src="../images/pairs/pair-1-after-1200.jpg" width="1200" height="675" alt="" loading="lazy" decoding="async"></button>
+            <button type="button" class="thumb" style="--ar:3.5556" aria-pressed="false" data-before="../images/pairs/pair-2-before" data-after="../images/pairs/pair-2-after" data-w="2400" data-h="675" data-ws="1200" data-title="In the water" data-title-ru="В воде" data-meta="Blackmagic Pocket Cinema Camera 6K" data-meta-ru="Blackmagic Pocket Cinema Camera 6K"><img src="../images/pairs/pair-2-after-1200.jpg" width="1200" height="338" alt="" loading="lazy" decoding="async"></button>
+            <button type="button" class="thumb" style="--ar:3.5556" aria-pressed="false" data-before="../images/pairs/pair-3-before" data-after="../images/pairs/pair-3-after" data-w="2400" data-h="675" data-ws="1200" data-title="Corridor" data-title-ru="Коридор" data-meta="Blackmagic Pocket Cinema Camera 6K" data-meta-ru="Blackmagic Pocket Cinema Camera 6K"><img src="../images/pairs/pair-3-after-1200.jpg" width="1200" height="338" alt="" loading="lazy" decoding="async"></button>
             <button type="button" class="icon-btn soft" id="fsBtn" data-aria-en="Full screen" data-aria-ru="На весь экран">
               <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 7.5v-4h4M16.5 7.5v-4h-4M3.5 12.5v4h4M16.5 12.5v4h-4"/></svg>
             </button>
@@ -526,29 +533,23 @@ main > section.hero { margin-top: 0; }
     <h2 class="h2"><span lang="en">Photographs</span><span lang="ru">Фотографии</span></h2>
     <p class="lead"><span lang="en">Shot and graded by me, from the first frame to the final color.</span><span lang="ru">Снимал и делал цвет сам, от первого кадра до финального результата.</span></p>
     <div class="rows sec-body" id="photoGrid">
-      <figure class="tile" style="--ar:1.5" data-src="../images/photos/photo-01" data-w="2400" data-h="1600" data-ws="1200" data-title="Placeholder photo 1" data-title-ru="Заглушка, фото 1" data-meta="To be added" data-meta-ru="Будет добавлено">
-        <button type="button" class="tile-media"><img src="../images/photos/photo-01-1200.jpg" srcset="../images/photos/photo-01-1200.jpg 1200w, ../images/photos/photo-01.jpg 2400w" sizes="(max-width: 600px) 100vw, 50vw" width="2400" height="1600" alt="Placeholder photo 1" loading="lazy" decoding="async"></button>
+      <figure class="tile" style="--ar:0.6675" data-src="../images/photos/photo-01" data-before="../images/photos/photo-01-before" data-w="1602" data-h="2400" data-ws="801" data-title="Portrait session" data-title-ru="Портретная съёмка" data-meta="Canon EOS 6D Mark II" data-meta-ru="Canon EOS 6D Mark II">
+        <button type="button" class="tile-media"><img src="../images/photos/photo-01-1200.jpg" srcset="../images/photos/photo-01-1200.jpg 801w, ../images/photos/photo-01.jpg 1602w" sizes="(max-width: 600px) 100vw, 34vw" width="1602" height="2400" alt="Portrait session" loading="lazy" decoding="async"></button>
       </figure>
-      <figure class="tile" style="--ar:0.6671" data-src="../images/photos/photo-02" data-w="1601" data-h="2400" data-ws="801" data-title="Placeholder photo 2" data-title-ru="Заглушка, фото 2" data-meta="To be added" data-meta-ru="Будет добавлено">
-        <button type="button" class="tile-media"><img src="../images/photos/photo-02-1200.jpg" srcset="../images/photos/photo-02-1200.jpg 801w, ../images/photos/photo-02.jpg 1601w" sizes="(max-width: 600px) 100vw, 50vw" width="1601" height="2400" alt="Placeholder photo 2" loading="lazy" decoding="async"></button>
+      <figure class="tile" style="--ar:0.6675" data-src="../images/photos/photo-02" data-before="../images/photos/photo-02-before" data-w="1602" data-h="2400" data-ws="801" data-title="Portrait session" data-title-ru="Портретная съёмка" data-meta="Canon EOS 6D Mark II" data-meta-ru="Canon EOS 6D Mark II">
+        <button type="button" class="tile-media"><img src="../images/photos/photo-02-1200.jpg" srcset="../images/photos/photo-02-1200.jpg 801w, ../images/photos/photo-02.jpg 1602w" sizes="(max-width: 600px) 100vw, 34vw" width="1602" height="2400" alt="Portrait session" loading="lazy" decoding="async"></button>
       </figure>
-      <figure class="tile" style="--ar:0.8" data-src="../images/photos/photo-03" data-w="1920" data-h="2400" data-ws="960" data-title="Placeholder photo 3" data-title-ru="Заглушка, фото 3" data-meta="To be added" data-meta-ru="Будет добавлено">
-        <button type="button" class="tile-media"><img src="../images/photos/photo-03-1200.jpg" srcset="../images/photos/photo-03-1200.jpg 960w, ../images/photos/photo-03.jpg 1920w" sizes="(max-width: 600px) 100vw, 50vw" width="1920" height="2400" alt="Placeholder photo 3" loading="lazy" decoding="async"></button>
+      <figure class="tile" style="--ar:0.6675" data-src="../images/photos/photo-03" data-before="../images/photos/photo-03-before" data-w="1602" data-h="2400" data-ws="801" data-title="Portrait session" data-title-ru="Портретная съёмка" data-meta="Canon EOS 6D Mark II" data-meta-ru="Canon EOS 6D Mark II">
+        <button type="button" class="tile-media"><img src="../images/photos/photo-03-1200.jpg" srcset="../images/photos/photo-03-1200.jpg 801w, ../images/photos/photo-03.jpg 1602w" sizes="(max-width: 600px) 100vw, 34vw" width="1602" height="2400" alt="Portrait session" loading="lazy" decoding="async"></button>
       </figure>
-      <figure class="tile" style="--ar:1.7804" data-src="../images/photos/photo-04" data-w="2400" data-h="1348" data-ws="1200" data-title="Placeholder photo 4" data-title-ru="Заглушка, фото 4" data-meta="To be added" data-meta-ru="Будет добавлено">
-        <button type="button" class="tile-media"><img src="../images/photos/photo-04-1200.jpg" srcset="../images/photos/photo-04-1200.jpg 1200w, ../images/photos/photo-04.jpg 2400w" sizes="(max-width: 600px) 100vw, 50vw" width="2400" height="1348" alt="Placeholder photo 4" loading="lazy" decoding="async"></button>
+      <figure class="tile" style="--ar:0.6675" data-src="../images/photos/photo-04" data-before="../images/photos/photo-04-before" data-w="1602" data-h="2400" data-ws="801" data-title="Portrait session" data-title-ru="Портретная съёмка" data-meta="Canon EOS 6D Mark II" data-meta-ru="Canon EOS 6D Mark II">
+        <button type="button" class="tile-media"><img src="../images/photos/photo-04-1200.jpg" srcset="../images/photos/photo-04-1200.jpg 801w, ../images/photos/photo-04.jpg 1602w" sizes="(max-width: 600px) 100vw, 34vw" width="1602" height="2400" alt="Portrait session" loading="lazy" decoding="async"></button>
       </figure>
-      <figure class="tile" style="--ar:1" data-src="../images/photos/photo-05" data-w="2400" data-h="2400" data-ws="1200" data-title="Placeholder photo 5" data-title-ru="Заглушка, фото 5" data-meta="To be added" data-meta-ru="Будет добавлено">
-        <button type="button" class="tile-media"><img src="../images/photos/photo-05-1200.jpg" srcset="../images/photos/photo-05-1200.jpg 1200w, ../images/photos/photo-05.jpg 2400w" sizes="(max-width: 600px) 100vw, 50vw" width="2400" height="2400" alt="Placeholder photo 5" loading="lazy" decoding="async"></button>
+      <figure class="tile" style="--ar:0.6675" data-src="../images/photos/photo-05" data-before="../images/photos/photo-05-before" data-w="1602" data-h="2400" data-ws="801" data-title="Portrait session" data-title-ru="Портретная съёмка" data-meta="Canon EOS 6D Mark II" data-meta-ru="Canon EOS 6D Mark II">
+        <button type="button" class="tile-media"><img src="../images/photos/photo-05-1200.jpg" srcset="../images/photos/photo-05-1200.jpg 801w, ../images/photos/photo-05.jpg 1602w" sizes="(max-width: 600px) 100vw, 34vw" width="1602" height="2400" alt="Portrait session" loading="lazy" decoding="async"></button>
       </figure>
-      <figure class="tile" style="--ar:1.5" data-src="../images/photos/photo-06" data-w="2400" data-h="1600" data-ws="1200" data-title="Placeholder photo 6" data-title-ru="Заглушка, фото 6" data-meta="To be added" data-meta-ru="Будет добавлено">
-        <button type="button" class="tile-media"><img src="../images/photos/photo-06-1200.jpg" srcset="../images/photos/photo-06-1200.jpg 1200w, ../images/photos/photo-06.jpg 2400w" sizes="(max-width: 600px) 100vw, 50vw" width="2400" height="1600" alt="Placeholder photo 6" loading="lazy" decoding="async"></button>
-      </figure>
-      <figure class="tile" style="--ar:0.8" data-src="../images/photos/photo-07" data-w="1920" data-h="2400" data-ws="960" data-title="Placeholder photo 7" data-title-ru="Заглушка, фото 7" data-meta="To be added" data-meta-ru="Будет добавлено">
-        <button type="button" class="tile-media"><img src="../images/photos/photo-07-1200.jpg" srcset="../images/photos/photo-07-1200.jpg 960w, ../images/photos/photo-07.jpg 1920w" sizes="(max-width: 600px) 100vw, 50vw" width="1920" height="2400" alt="Placeholder photo 7" loading="lazy" decoding="async"></button>
-      </figure>
-      <figure class="tile" style="--ar:1.5" data-src="../images/photos/photo-08" data-w="2400" data-h="1600" data-ws="1200" data-title="Placeholder photo 8" data-title-ru="Заглушка, фото 8" data-meta="To be added" data-meta-ru="Будет добавлено">
-        <button type="button" class="tile-media"><img src="../images/photos/photo-08-1200.jpg" srcset="../images/photos/photo-08-1200.jpg 1200w, ../images/photos/photo-08.jpg 2400w" sizes="(max-width: 600px) 100vw, 50vw" width="2400" height="1600" alt="Placeholder photo 8" loading="lazy" decoding="async"></button>
+      <figure class="tile" style="--ar:0.6675" data-src="../images/photos/photo-06" data-before="../images/photos/photo-06-before" data-w="1602" data-h="2400" data-ws="801" data-title="Portrait session" data-title-ru="Портретная съёмка" data-meta="Canon EOS 6D Mark II" data-meta-ru="Canon EOS 6D Mark II">
+        <button type="button" class="tile-media"><img src="../images/photos/photo-06-1200.jpg" srcset="../images/photos/photo-06-1200.jpg 801w, ../images/photos/photo-06.jpg 1602w" sizes="(max-width: 600px) 100vw, 34vw" width="1602" height="2400" alt="Portrait session" loading="lazy" decoding="async"></button>
       </figure>
     </div>
   </section>
@@ -559,8 +560,8 @@ main > section.hero { margin-top: 0; }
       <div class="about-head">
         <h2 class="h2"><span lang="en">About</span><span lang="ru">Обо мне</span></h2>
       </div>
-      <div class="portrait">
-        <span class="portrait-ph"><span lang="en">Portrait placeholder</span><span lang="ru">Заглушка портрета</span></span>
+      <div class="portrait" style="aspect-ratio:1911 / 2400">
+        <img src="../images/about/portrait-1200.jpg" srcset="../images/about/portrait-1200.jpg 955w, ../images/about/portrait.jpg 1911w" sizes="(max-width: 900px) 100vw, 40vw" width="1911" height="2400" alt="Bilol Muhammadjonov" loading="lazy" decoding="async">
       </div>
       <div class="about-body">
         <p><span lang="en">I'm Bilol, a colorist from Tashkent with five years in television, commercials and music videos. I work in DaVinci Resolve Studio with ACES and HDR pipelines.</span><span lang="ru">Я Билол, колорист из Ташкента. Пять лет работаю в телевидении, рекламе и клипах, в DaVinci Resolve Studio с пайплайнами ACES и HDR.</span></p>
@@ -1116,7 +1117,7 @@ main > section.hero { margin-top: 0; }
   }
 
   /* before / after stage */
-  var stage = $('#stage'), stA = $('.w-after', stage), stB = $('.w-before', stage);
+  var ba = $('#ba'), stage = $('#stage'), stA = $('.w-after', stage), stB = $('.w-before', stage);
   var thumbs = $$('.thumb');
   var pairs = thumbs.map(function (t) {
     return { el: t, a: t.dataset.after, b: t.dataset.before, w: +t.dataset.w, h: +t.dataset.h, ws: +t.dataset.ws, origin: null };
@@ -1163,17 +1164,18 @@ main > section.hero { margin-top: 0; }
     wait(rm ? 0 : 300).then(function () {
       var r0 = stage.getBoundingClientRect();
       setStageImg(stA, p.a, p); setStageImg(stB, p.b, p);
-      stage.style.setProperty('--ar', p.w / p.h);
+      ba.style.setProperty('--ar', p.w / p.h);
       wipe.set(keepPos == null ? 0 : keepPos);
       pairText();
       var r1 = stage.getBoundingClientRect(), grow = Promise.resolve();
       if (!rm && (Math.abs(r1.height - r0.height) > 1 || Math.abs(r1.width - r0.width) > 1)) {
-        stage.style.width = r0.width + 'px'; stage.style.height = r0.height + 'px';
+        ba.style.width = r0.width + 'px'; stage.style.height = r0.height + 'px';
         stage.offsetWidth;
-        stage.classList.add('is-resizing');
-        stage.style.width = r1.width + 'px'; stage.style.height = r1.height + 'px';
+        ba.classList.add('is-resizing'); stage.classList.add('is-resizing');
+        ba.style.width = r1.width + 'px'; stage.style.height = r1.height + 'px';
         grow = wait(470).then(function () {
-          stage.classList.remove('is-resizing'); stage.style.width = ''; stage.style.height = '';
+          ba.classList.remove('is-resizing'); stage.classList.remove('is-resizing');
+          ba.style.width = ''; stage.style.height = '';
         });
       }
       return Promise.all([grow, loaded(stA), loaded(stB)]);
@@ -1192,7 +1194,7 @@ main > section.hero { margin-top: 0; }
 
   /* tiles */
   var tileItem = function (f) {
-    return { el: f, a: f.dataset.src, b: null, w: +f.dataset.w, h: +f.dataset.h, ws: +f.dataset.ws, origin: $('.tile-media', f) };
+    return { el: f, a: f.dataset.src, b: f.dataset.before || null, w: +f.dataset.w, h: +f.dataset.h, ws: +f.dataset.ws, origin: $('.tile-media', f) };
   };
   var photoItems = $$('#photoGrid .tile').map(tileItem);
   function tileText() {
@@ -1270,6 +1272,8 @@ main > section.hero { margin-top: 0; }
       lb.classList.remove('is-flying');
       if (!V) return;
       lbShow(true);
+      // the tile shows the grade only, so the viewer opens on it and then slides the wipe in
+      if (it.b && opts.pos == null) lbWipe.sweep(100, 50, 700);
       V.busy = false;
     };
     if (!reduced() && origin && inView(origin)) {
@@ -1295,6 +1299,7 @@ main > section.hero { margin-top: 0; }
     lbWipe.stop();
     if (!reduced() && origin && inView(origin)) {
       lb.classList.add('is-flying');
+      if (it.b && !opts.origin) lbWipe.sweep(lbWipe.pos, 100, 380);
       var from = lbFrame.getBoundingClientRect(), to = origin.getBoundingClientRect();
       var r0 = parseFloat(getComputedStyle(origin).borderTopLeftRadius) || 14;
       fadeUi(1, 0, 160);
