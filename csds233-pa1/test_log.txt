@@ -1,0 +1,575 @@
+CSDS 233 PA1 - Interactive Music Sequencer - PhraseList test log
+Java 21.0.11 | headless (no MidiPlayer) | checkInvariants() after every operation
+
+=== RUNNING TEST T-01: INSERT INTO EMPTY LIST SETS CURRENT ===
+Initial List: (empty)
+Size: 0 | Head: null | Tail: null | Current: null
+Executing: insertLast("C4:1.0")
+Result List: [ C4:1.0 ]
+Size: 1 | Head: C4:1.0 | Tail: C4:1.0 | Current: C4:1.0
+Check Backwards Link (Tail to Head): C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-02: IN-PLACE MOVE (TAIL TO HEAD) ===
+Initial List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: E4:1.0
+Executing: move(2, 0)
+Result List: [ G4:2.0 ] <-> [ C4:1.0 ] <-> [ E4:1.0 ]
+Size: 3 | Head: G4:2.0 | Tail: E4:1.0 | Current: E4:1.0
+Check Backwards Link (Tail to Head): E4:1.0 -> C4:1.0 -> G4:2.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-03: IN-PLACE MOVE (HEAD TO TAIL) ===
+Initial List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: E4:1.0
+Executing: move(0, 2)
+Result List: [ E4:1.0 ] <-> [ G4:2.0 ] <-> [ C4:1.0 ]
+Size: 3 | Head: E4:1.0 | Tail: C4:1.0 | Current: E4:1.0
+Check Backwards Link (Tail to Head): C4:1.0 -> G4:2.0 -> E4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-04: IN-PLACE MOVE (ADJACENT, FORWARD) ===
+Initial List: [ C4:1.0 ] <-> [ D4:1.0 ] <-> [ E4:1.0 ] <-> [ F4:1.0 ]
+Size: 4 | Head: C4:1.0 | Tail: F4:1.0 | Current: E4:1.0
+Executing: move(1, 2)
+Result List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ D4:1.0 ] <-> [ F4:1.0 ]
+Size: 4 | Head: C4:1.0 | Tail: F4:1.0 | Current: E4:1.0
+Check Backwards Link (Tail to Head): F4:1.0 -> D4:1.0 -> E4:1.0 -> C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-05: IN-PLACE MOVE (ADJACENT, BACKWARD) ===
+Initial List: [ C4:1.0 ] <-> [ D4:1.0 ] <-> [ E4:1.0 ] <-> [ F4:1.0 ]
+Size: 4 | Head: C4:1.0 | Tail: F4:1.0 | Current: D4:1.0
+Executing: move(2, 1)
+Result List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ D4:1.0 ] <-> [ F4:1.0 ]
+Size: 4 | Head: C4:1.0 | Tail: F4:1.0 | Current: D4:1.0
+Check Backwards Link (Tail to Head): F4:1.0 -> D4:1.0 -> E4:1.0 -> C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-06: IN-PLACE MOVE (HEAD TO ADJACENT POSITION) ===
+Initial List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: C4:1.0
+Executing: move(0, 1)
+Result List: [ E4:1.0 ] <-> [ C4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: E4:1.0 | Tail: G4:2.0 | Current: C4:1.0
+Check Backwards Link (Tail to Head): G4:2.0 -> C4:1.0 -> E4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-07: IN-PLACE MOVE (TAIL TO ADJACENT POSITION) ===
+Initial List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: G4:2.0
+Executing: move(2, 1)
+Result List: [ C4:1.0 ] <-> [ G4:2.0 ] <-> [ E4:1.0 ]
+Size: 3 | Head: C4:1.0 | Tail: E4:1.0 | Current: G4:2.0
+Check Backwards Link (Tail to Head): E4:1.0 -> G4:2.0 -> C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-08: IN-PLACE MOVE (MIDDLE, NON-ADJACENT FORWARD) ===
+Initial List: [ C4:1.0 ] <-> [ D4:1.0 ] <-> [ E4:1.0 ] <-> [ F4:1.0 ] <-> [ G4:1.0 ]
+Size: 5 | Head: C4:1.0 | Tail: G4:1.0 | Current: D4:1.0
+Executing: move(1, 3)
+Result List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ F4:1.0 ] <-> [ D4:1.0 ] <-> [ G4:1.0 ]
+Size: 5 | Head: C4:1.0 | Tail: G4:1.0 | Current: D4:1.0
+Check Backwards Link (Tail to Head): G4:1.0 -> D4:1.0 -> F4:1.0 -> E4:1.0 -> C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-09: IN-PLACE MOVE (MIDDLE, NON-ADJACENT BACKWARD) ===
+Initial List: [ C4:1.0 ] <-> [ D4:1.0 ] <-> [ E4:1.0 ] <-> [ F4:1.0 ] <-> [ G4:1.0 ]
+Size: 5 | Head: C4:1.0 | Tail: G4:1.0 | Current: G4:1.0
+Executing: move(3, 1)
+Result List: [ C4:1.0 ] <-> [ F4:1.0 ] <-> [ D4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:1.0 ]
+Size: 5 | Head: C4:1.0 | Tail: G4:1.0 | Current: G4:1.0
+Check Backwards Link (Tail to Head): G4:1.0 -> E4:1.0 -> D4:1.0 -> F4:1.0 -> C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-10: IN-PLACE MOVE ON SIZE 2 (TAIL TO HEAD) ===
+Initial List: [ C4:1.0 ] <-> [ E4:1.0 ]
+Size: 2 | Head: C4:1.0 | Tail: E4:1.0 | Current: C4:1.0
+Executing: move(1, 0)
+Result List: [ E4:1.0 ] <-> [ C4:1.0 ]
+Size: 2 | Head: E4:1.0 | Tail: C4:1.0 | Current: C4:1.0
+Check Backwards Link (Tail to Head): C4:1.0 -> E4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-11: IN-PLACE MOVE ON SIZE 2 (HEAD TO TAIL) ===
+Initial List: [ C4:1.0 ] <-> [ E4:1.0 ]
+Size: 2 | Head: C4:1.0 | Tail: E4:1.0 | Current: E4:1.0
+Executing: move(0, 1)
+Result List: [ E4:1.0 ] <-> [ C4:1.0 ]
+Size: 2 | Head: E4:1.0 | Tail: C4:1.0 | Current: E4:1.0
+Check Backwards Link (Tail to Head): C4:1.0 -> E4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-12: MOVE WITH SAME SOURCE AND TARGET (NO-OP) ===
+Initial List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: E4:1.0
+Executing: move(0, 0); move(1, 1); move(2, 2)
+Result List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: E4:1.0
+Check Backwards Link (Tail to Head): G4:2.0 -> E4:1.0 -> C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-13: MOVE ON SIZE 1 ===
+Initial List: [ C4:1.0 ]
+Size: 1 | Head: C4:1.0 | Tail: C4:1.0 | Current: C4:1.0
+Executing: move(0, 0); move(0, 1); move(1, 0)
+Result List: [ C4:1.0 ]
+Size: 1 | Head: C4:1.0 | Tail: C4:1.0 | Current: C4:1.0
+Check Backwards Link (Tail to Head): C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-14: MOVE ON EMPTY LIST IS REJECTED ===
+Initial List: (empty)
+Size: 0 | Head: null | Tail: null | Current: null
+Executing: move(0, 0); move(-1, 0)
+Result List: (empty)
+Size: 0 | Head: null | Tail: null | Current: null
+Check Backwards Link (Tail to Head): null
+[SUCCESS]
+
+=== RUNNING TEST T-15: MOVE WITH INVALID INDICES IS REJECTED ===
+Initial List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: E4:1.0
+Executing: move(-1, 0); move(3, 0); move(4, 1); move(0, -1); move(0, 3); move(1, 9)
+Result List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: E4:1.0
+Check Backwards Link (Tail to Head): G4:2.0 -> E4:1.0 -> C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-16: MOVE ROUND TRIPS PRESERVE NODE IDENTITY ===
+Initial List: [ C4:1.0 ] <-> [ D4:1.0 ] <-> [ E4:1.0 ] <-> [ F4:1.0 ] <-> [ G4:1.0 ]
+Size: 5 | Head: C4:1.0 | Tail: G4:1.0 | Current: E4:1.0
+Executing: move(i, j) then move(j, i) for every i, j in 0..4 (25 round trips)
+Result List: [ C4:1.0 ] <-> [ D4:1.0 ] <-> [ E4:1.0 ] <-> [ F4:1.0 ] <-> [ G4:1.0 ]
+Size: 5 | Head: C4:1.0 | Tail: G4:1.0 | Current: E4:1.0
+Check Backwards Link (Tail to Head): G4:1.0 -> F4:1.0 -> E4:1.0 -> D4:1.0 -> C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-17: INSERTFIRST ON EMPTY AND NON-EMPTY LIST ===
+Initial List: (empty)
+Size: 0 | Head: null | Tail: null | Current: null
+Executing: insertFirst("E4:1.0"); insertFirst("C4:1.0")
+Result List: [ C4:1.0 ] <-> [ E4:1.0 ]
+Size: 2 | Head: C4:1.0 | Tail: E4:1.0 | Current: E4:1.0
+Check Backwards Link (Tail to Head): E4:1.0 -> C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-18: INSERTAT(0) ON EMPTY LIST SETS CURRENT ===
+Initial List: (empty)
+Size: 0 | Head: null | Tail: null | Current: null
+Executing: insertAt(0, "C4:1.0")
+Result List: [ C4:1.0 ]
+Size: 1 | Head: C4:1.0 | Tail: C4:1.0 | Current: C4:1.0
+Check Backwards Link (Tail to Head): C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-19: INSERTAT FRONT, MIDDLE AND END (INDEX == SIZE) ===
+Initial List: [ D4:1.0 ] <-> [ F4:1.0 ]
+Size: 2 | Head: D4:1.0 | Tail: F4:1.0 | Current: D4:1.0
+Executing: insertAt(0, "C4:1.0"); insertAt(2, "E4:1.0"); insertAt(4, "G4:1.0")
+Result List: [ C4:1.0 ] <-> [ D4:1.0 ] <-> [ E4:1.0 ] <-> [ F4:1.0 ] <-> [ G4:1.0 ]
+Size: 5 | Head: C4:1.0 | Tail: G4:1.0 | Current: D4:1.0
+Check Backwards Link (Tail to Head): G4:1.0 -> F4:1.0 -> E4:1.0 -> D4:1.0 -> C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-20: INSERT AFTER CURRENT ON EMPTY LIST ===
+Initial List: (empty)
+Size: 0 | Head: null | Tail: null | Current: null
+Executing: insertAfterCurrent("C4:1.0")
+Result List: [ C4:1.0 ]
+Size: 1 | Head: C4:1.0 | Tail: C4:1.0 | Current: C4:1.0
+Check Backwards Link (Tail to Head): C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-21: INSERT AFTER CURRENT IN THE MIDDLE ===
+Initial List: [ C4:1.0 ] <-> [ G4:2.0 ]
+Size: 2 | Head: C4:1.0 | Tail: G4:2.0 | Current: C4:1.0
+Executing: insertAfterCurrent("E4:1.0")
+Result List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: C4:1.0
+Check Backwards Link (Tail to Head): G4:2.0 -> E4:1.0 -> C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-22: INSERT AFTER CURRENT AT TAIL UPDATES TAIL ===
+Initial List: [ C4:1.0 ] <-> [ E4:1.0 ]
+Size: 2 | Head: C4:1.0 | Tail: E4:1.0 | Current: E4:1.0
+Executing: insertAfterCurrent("G4:2.0")
+Result List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: E4:1.0
+Check Backwards Link (Tail to Head): G4:2.0 -> E4:1.0 -> C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-23: REPEAT CURRENT ON SIZE 1 ===
+Initial List: [ C4:1.0 ]
+Size: 1 | Head: C4:1.0 | Tail: C4:1.0 | Current: C4:1.0
+Executing: repeatCurrent()
+Result List: [ C4:1.0 ] <-> [ C4:1.0 ]
+Size: 2 | Head: C4:1.0 | Tail: C4:1.0 | Current: C4:1.0
+Check Backwards Link (Tail to Head): C4:1.0 -> C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-24: REPEAT CURRENT FROM THE MIDDLE APPENDS TO END ===
+Initial List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: E4:1.0
+Executing: repeatCurrent()
+Result List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ] <-> [ E4:1.0 ]
+Size: 4 | Head: C4:1.0 | Tail: E4:1.0 | Current: E4:1.0
+Check Backwards Link (Tail to Head): E4:1.0 -> G4:2.0 -> E4:1.0 -> C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-25: REPEAT CURRENT ON EMPTY LIST ===
+Initial List: (empty)
+Size: 0 | Head: null | Tail: null | Current: null
+Executing: repeatCurrent()
+Result List: (empty)
+Size: 0 | Head: null | Tail: null | Current: null
+Check Backwards Link (Tail to Head): null
+[SUCCESS]
+
+=== RUNNING TEST T-26: REMOVE CURRENT IN THE MIDDLE (CURRENT -> NEXT) ===
+Initial List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: E4:1.0
+Executing: removeCurrent()
+Result List: [ C4:1.0 ] <-> [ G4:2.0 ]
+Size: 2 | Head: C4:1.0 | Tail: G4:2.0 | Current: G4:2.0
+Check Backwards Link (Tail to Head): G4:2.0 -> C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-27: REMOVE CURRENT AT TAIL (CURRENT -> PREV) ===
+Initial List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: G4:2.0
+Executing: removeCurrent()
+Result List: [ C4:1.0 ] <-> [ E4:1.0 ]
+Size: 2 | Head: C4:1.0 | Tail: E4:1.0 | Current: E4:1.0
+Check Backwards Link (Tail to Head): E4:1.0 -> C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-28: REMOVE CURRENT AT HEAD (CURRENT -> NEXT) ===
+Initial List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: C4:1.0
+Executing: removeCurrent()
+Result List: [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 2 | Head: E4:1.0 | Tail: G4:2.0 | Current: E4:1.0
+Check Backwards Link (Tail to Head): G4:2.0 -> E4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-29: REMOVE CURRENT ON SIZE 2 (TAIL) ===
+Initial List: [ C4:1.0 ] <-> [ E4:1.0 ]
+Size: 2 | Head: C4:1.0 | Tail: E4:1.0 | Current: E4:1.0
+Executing: removeCurrent()
+Result List: [ C4:1.0 ]
+Size: 1 | Head: C4:1.0 | Tail: C4:1.0 | Current: C4:1.0
+Check Backwards Link (Tail to Head): C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-30: REMOVE CURRENT ON SIZE 1 (LIST BECOMES EMPTY) ===
+Initial List: [ C4:1.0 ]
+Size: 1 | Head: C4:1.0 | Tail: C4:1.0 | Current: C4:1.0
+Executing: removeCurrent()
+Result List: (empty)
+Size: 0 | Head: null | Tail: null | Current: null
+Check Backwards Link (Tail to Head): null
+[SUCCESS]
+
+=== RUNNING TEST T-31: REMOVE CURRENT ON EMPTY LIST ===
+Initial List: (empty)
+Size: 0 | Head: null | Tail: null | Current: null
+Executing: removeCurrent()
+Result List: (empty)
+Size: 0 | Head: null | Tail: null | Current: null
+Check Backwards Link (Tail to Head): null
+[SUCCESS]
+
+=== RUNNING TEST T-32: REMOVEAT ON THE CURRENT NODE (MIDDLE -> NEXT) ===
+Initial List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: E4:1.0
+Executing: removeAt(1)
+Result List: [ C4:1.0 ] <-> [ G4:2.0 ]
+Size: 2 | Head: C4:1.0 | Tail: G4:2.0 | Current: G4:2.0
+Check Backwards Link (Tail to Head): G4:2.0 -> C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-33: REMOVEAT ON THE CURRENT NODE (TAIL -> PREV) ===
+Initial List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: G4:2.0
+Executing: removeAt(2)
+Result List: [ C4:1.0 ] <-> [ E4:1.0 ]
+Size: 2 | Head: C4:1.0 | Tail: E4:1.0 | Current: E4:1.0
+Check Backwards Link (Tail to Head): E4:1.0 -> C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-34: REMOVEAT ON OTHER NODES KEEPS CURRENT ===
+Initial List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: E4:1.0
+Executing: removeAt(0); removeAt(1)
+Result List: [ E4:1.0 ]
+Size: 1 | Head: E4:1.0 | Tail: E4:1.0 | Current: E4:1.0
+Check Backwards Link (Tail to Head): E4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-35: REMOVEAT(0) ON SIZE 2 (HEAD) ===
+Initial List: [ C4:1.0 ] <-> [ E4:1.0 ]
+Size: 2 | Head: C4:1.0 | Tail: E4:1.0 | Current: C4:1.0
+Executing: removeAt(0)
+Result List: [ E4:1.0 ]
+Size: 1 | Head: E4:1.0 | Tail: E4:1.0 | Current: E4:1.0
+Check Backwards Link (Tail to Head): E4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-36: REMOVEAT(0) ON EMPTY LIST ===
+Initial List: (empty)
+Size: 0 | Head: null | Tail: null | Current: null
+Executing: removeAt(0)
+Result List: (empty)
+Size: 0 | Head: null | Tail: null | Current: null
+Check Backwards Link (Tail to Head): null
+[SUCCESS]
+
+=== RUNNING TEST T-37: CLEAR RESETS HEAD, TAIL, SIZE AND CURRENT ===
+Initial List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: E4:1.0
+Executing: clear()
+Result List: (empty)
+Size: 0 | Head: null | Tail: null | Current: null
+Check Backwards Link (Tail to Head): null
+[SUCCESS]
+
+=== RUNNING TEST T-38: GET OUT OF BOUNDS (NEGATIVE, == SIZE, > SIZE) ===
+Initial List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: E4:1.0
+Executing: get(-1); get(3); get(4)
+Result List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: E4:1.0
+Check Backwards Link (Tail to Head): G4:2.0 -> E4:1.0 -> C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-39: REMOVEAT OUT OF BOUNDS (NEGATIVE, == SIZE, > SIZE) ===
+Initial List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: E4:1.0
+Executing: removeAt(-1); removeAt(3); removeAt(4)
+Result List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: E4:1.0
+Check Backwards Link (Tail to Head): G4:2.0 -> E4:1.0 -> C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-40: INSERTAT OUT OF BOUNDS (NEGATIVE, SIZE + 1, > SIZE + 1) ===
+Initial List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: E4:1.0
+Executing: insertAt(-1, "A4:1.0"); insertAt(4, "A4:1.0"); insertAt(10, "A4:1.0")
+Result List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: E4:1.0
+Check Backwards Link (Tail to Head): G4:2.0 -> E4:1.0 -> C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-41: GET ON EMPTY LIST ===
+Initial List: (empty)
+Size: 0 | Head: null | Tail: null | Current: null
+Executing: get(0); get(-1); get(1)
+Result List: (empty)
+Size: 0 | Head: null | Tail: null | Current: null
+Check Backwards Link (Tail to Head): null
+[SUCCESS]
+
+=== RUNNING TEST T-42: GET WALKS FROM THE CLOSER END ===
+Initial List: [ C4:1.0 ] <-> [ D4:1.0 ] <-> [ E4:1.0 ] <-> [ F4:1.0 ] <-> [ G4:1.0 ] <-> [ A4:1.0 ] <-> [ B4:1.0 ]
+Size: 7 | Head: C4:1.0 | Tail: B4:1.0 | Current: C4:1.0
+Executing: get(i) for i = 0..6
+Result List: [ C4:1.0 ] <-> [ D4:1.0 ] <-> [ E4:1.0 ] <-> [ F4:1.0 ] <-> [ G4:1.0 ] <-> [ A4:1.0 ] <-> [ B4:1.0 ]
+Size: 7 | Head: C4:1.0 | Tail: B4:1.0 | Current: C4:1.0
+Check Backwards Link (Tail to Head): B4:1.0 -> A4:1.0 -> G4:1.0 -> F4:1.0 -> E4:1.0 -> D4:1.0 -> C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-43: NAVIGATION STOPS AT BOTH ENDS ===
+Initial List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: C4:1.0
+Executing: moveBackward(); moveForward(); moveForward(); moveForward(); moveBackward()
+Result List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: E4:1.0
+Check Backwards Link (Tail to Head): G4:2.0 -> E4:1.0 -> C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-44: NAVIGATION ON SIZE 1 ===
+Initial List: [ C4:1.0 ]
+Size: 1 | Head: C4:1.0 | Tail: C4:1.0 | Current: C4:1.0
+Executing: moveForward(); moveBackward()
+Result List: [ C4:1.0 ]
+Size: 1 | Head: C4:1.0 | Tail: C4:1.0 | Current: C4:1.0
+Check Backwards Link (Tail to Head): C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-45: NAVIGATION ON EMPTY LIST ===
+Initial List: (empty)
+Size: 0 | Head: null | Tail: null | Current: null
+Executing: moveForward(); moveBackward(); getCurrent(); getCurrentIndex()
+Result List: (empty)
+Size: 0 | Head: null | Tail: null | Current: null
+Check Backwards Link (Tail to Head): null
+[SUCCESS]
+
+=== RUNNING TEST T-46: PLAY ALL VISITS EVERY NODE HEAD TO TAIL ===
+Initial List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: E4:1.0
+Executing: traverseAll(recorder)
+Result List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: E4:1.0
+Check Backwards Link (Tail to Head): G4:2.0 -> E4:1.0 -> C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-47: PLAY FROM CURRENT STARTS AT CURRENT ===
+Initial List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: E4:1.0
+Executing: traverseFromCurrent(recorder)
+Result List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: E4:1.0
+Check Backwards Link (Tail to Head): G4:2.0 -> E4:1.0 -> C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-48: PLAY STOPS EARLY WHEN THE VISITOR RETURNS FALSE ===
+Initial List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: C4:1.0
+Executing: traverseAll(recorder that returns false at index 1)
+Result List: [ C4:1.0 ] <-> [ E4:1.0 ] <-> [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: C4:1.0
+Check Backwards Link (Tail to Head): G4:2.0 -> E4:1.0 -> C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-49: PLAYBACK ON EMPTY LIST PLAYS NOTHING ===
+Initial List: (empty)
+Size: 0 | Head: null | Tail: null | Current: null
+Executing: traverseAll(recorder); traverseFromCurrent(recorder); getCurrent()
+Result List: (empty)
+Size: 0 | Head: null | Tail: null | Current: null
+Check Backwards Link (Tail to Head): null
+[SUCCESS]
+
+=== RUNNING TEST T-50: INVALID PHRASES ARE REJECTED AND NOT INSERTED ===
+Initial List: [ C4:1.0 ]
+Size: 1 | Head: C4:1.0 | Tail: C4:1.0 | Current: C4:1.0
+Executing: for 24 malformed phrases: insertLast(p) only if PhraseValidator.validate(p) == null
+Result List: [ C4:1.0 ]
+Size: 1 | Head: C4:1.0 | Tail: C4:1.0 | Current: C4:1.0
+Check Backwards Link (Tail to Head): C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-51: VALID PHRASES (SHARPS, FLATS, RESTS, CHORDS) ARE ACCEPTED ===
+Initial List: (empty)
+Size: 0 | Head: null | Tail: null | Current: null
+Executing: for 8 valid phrases: insertLast(normalize(p)) after validate(p) == null
+Result List: [ C4:1.0 ] <-> [ D#4:0.5 ] <-> [ Eb5:0.25 ] <-> [ R:0.5 ] <-> [ C4+E4+G4:1.0 ] <-> [ A4:0.5 Bb3:.5 ] <-> [ G9:1 ] <-> [ Cb0:60 ]
+Size: 8 | Head: C4:1.0 | Tail: Cb0:60 | Current: C4:1.0
+Check Backwards Link (Tail to Head): Cb0:60 -> G9:1 -> A4:0.5 Bb3:.5 -> C4+E4+G4:1.0 -> R:0.5 -> Eb5:0.25 -> D#4:0.5 -> C4:1.0 -> null
+[SUCCESS]
+
+=== RUNNING TEST T-52: DEMO COMPOSITION LOADS AND EVERY PHRASE IS VALID ===
+Initial List: [ C4:1.0 ]
+Size: 1 | Head: C4:1.0 | Tail: C4:1.0 | Current: C4:1.0
+Executing: Main.loadDemoComposition(list)
+Result List: [ C4:0.5 C4:0.5 G4:0.5 G4:0.5 ] <-> [ A4:0.5 A4:0.5 G4:1.0 ] <-> [ F4:0.5 F4:0.5 E4:0.5 E4:0.5 ] <-> [ D4:0.5 D4:0.5 C4:1.0 ] <-> [ F4+A4+C5:0.5 G4+B4+D5:0.5 C4+E4+G4:1.0 ]
+Size: 5 | Head: C4:0.5 C4:0.5 G4:0.5 G4:0.5 | Tail: F4+A4+C5:0.5 G4+B4+D5:0.5 C4+E4+G4:1.0 | Current: C4:0.5 C4:0.5 G4:0.5 G4:0.5
+Check Backwards Link (Tail to Head): F4+A4+C5:0.5 G4+B4+D5:0.5 C4+E4+G4:1.0 -> D4:0.5 D4:0.5 C4:1.0 -> F4:0.5 F4:0.5 E4:0.5 E4:0.5 -> A4:0.5 A4:0.5 G4:1.0 -> C4:0.5 C4:0.5 G4:0.5 G4:0.5 -> null
+[SUCCESS]
+
+=== MESSAGES PRODUCED DURING THE RUN (exceptions and validator errors) ===
+T-13  move(0, 1) -> IndexOutOfBoundsException: Target index 1 is out of bounds for size 1 (valid range: 0..0)
+T-13  move(1, 0) -> IndexOutOfBoundsException: Source index 1 is out of bounds for size 1 (valid range: 0..0)
+T-14  move(0, 0) -> IndexOutOfBoundsException: Source index 0 is out of bounds: the list is empty
+T-14  move(-1, 0) -> IndexOutOfBoundsException: Source index -1 is out of bounds: the list is empty
+T-15  move(-1, 0) -> IndexOutOfBoundsException: Source index -1 is out of bounds for size 3 (valid range: 0..2)
+T-15  move(3, 0) -> IndexOutOfBoundsException: Source index 3 is out of bounds for size 3 (valid range: 0..2)
+T-15  move(4, 1) -> IndexOutOfBoundsException: Source index 4 is out of bounds for size 3 (valid range: 0..2)
+T-15  move(0, -1) -> IndexOutOfBoundsException: Target index -1 is out of bounds for size 3 (valid range: 0..2)
+T-15  move(0, 3) -> IndexOutOfBoundsException: Target index 3 is out of bounds for size 3 (valid range: 0..2)
+T-15  move(1, 9) -> IndexOutOfBoundsException: Target index 9 is out of bounds for size 3 (valid range: 0..2)
+T-36  removeAt(0) -> IndexOutOfBoundsException: Index 0 is out of bounds: the list is empty
+T-38  get(-1) -> IndexOutOfBoundsException: Index -1 is out of bounds for size 3 (valid range: 0..2)
+T-38  get(3) -> IndexOutOfBoundsException: Index 3 is out of bounds for size 3 (valid range: 0..2)
+T-38  get(4) -> IndexOutOfBoundsException: Index 4 is out of bounds for size 3 (valid range: 0..2)
+T-39  removeAt(-1) -> IndexOutOfBoundsException: Index -1 is out of bounds for size 3 (valid range: 0..2)
+T-39  removeAt(3) -> IndexOutOfBoundsException: Index 3 is out of bounds for size 3 (valid range: 0..2)
+T-39  removeAt(4) -> IndexOutOfBoundsException: Index 4 is out of bounds for size 3 (valid range: 0..2)
+T-40  insertAt(-1, A4:1.0) -> IndexOutOfBoundsException: Insert index -1 is out of bounds for size 3 (valid range: 0..3)
+T-40  insertAt(4, A4:1.0) -> IndexOutOfBoundsException: Insert index 4 is out of bounds for size 3 (valid range: 0..3)
+T-40  insertAt(10, A4:1.0) -> IndexOutOfBoundsException: Insert index 10 is out of bounds for size 3 (valid range: 0..3)
+T-41  get(0) on empty list -> IndexOutOfBoundsException: Index 0 is out of bounds: the list is empty
+T-41  get(-1) on empty list -> IndexOutOfBoundsException: Index -1 is out of bounds: the list is empty
+T-41  get(1) on empty list -> IndexOutOfBoundsException: Index 1 is out of bounds: the list is empty
+T-50  "C4:abc" -> token 1 'C4:abc' is invalid: duration 'abc' is not a positive decimal number (e.g. 0.5 or 1.0)
+T-50  "C4:1.0 E4:abc G4:1.0" -> token 2 'E4:abc' is invalid: duration 'abc' is not a positive decimal number (e.g. 0.5 or 1.0)
+T-50  "H4:1.0" -> token 1 'H4:1.0' is invalid: pitch 'H4' must start with a note letter A-G (or be R for a rest)
+T-50  "c4:1.0" -> token 1 'c4:1.0' is invalid: pitch 'c4' must use an uppercase note letter (e.g. C4, not c4)
+T-50  "R4:1.0" -> token 1 'R4:1.0' is invalid: pitch 'R4' must start with a note letter A-G (or be R for a rest)
+T-50  "C:1.0" -> token 1 'C:1.0' is invalid: pitch 'C' is missing its octave number (e.g. C4)
+T-50  "C10:1.0" -> token 1 'C10:1.0' is invalid: pitch 'C10' needs a single octave digit 0-9 after the note (use # or b for sharps and flats, e.g. D#4, Eb5)
+T-50  "C#b4:1.0" -> token 1 'C#b4:1.0' is invalid: pitch 'C#b4' needs a single octave digit 0-9 after the note (use # or b for sharps and flats, e.g. D#4, Eb5)
+T-50  "G#9:1.0" -> token 1 'G#9:1.0' is invalid: pitch 'G#9' is above the MIDI range (highest note is G9)
+T-50  "C4+:1.0" -> token 1 'C4+:1.0' is invalid: the chord 'C4+' has an empty note (write chords like C4+E4+G4)
+T-50  "C4+R:1.0" -> token 1 'C4+R:1.0' is invalid: a rest (R) cannot be part of a chord
+T-50  "C4" -> token 1 'C4' is invalid: missing ':' between pitch and duration (expected PITCH:DURATION, e.g. C4:1.0)
+T-50  "C4:1.0:2" -> token 1 'C4:1.0:2' is invalid: it has more than one ':' (expected PITCH:DURATION, e.g. C4:1.0)
+T-50  ":1.0" -> token 1 ':1.0' is invalid: the pitch before ':' is missing
+T-50  "C4:" -> token 1 'C4:' is invalid: the duration after ':' is missing
+T-50  "C4:0" -> token 1 'C4:0' is invalid: duration '0' must be greater than 0
+T-50  "C4:0.0" -> token 1 'C4:0.0' is invalid: duration '0.0' must be greater than 0
+T-50  "C4:-1" -> token 1 'C4:-1' is invalid: duration '-1' is not a positive decimal number (e.g. 0.5 or 1.0)
+T-50  "C4:1e3" -> token 1 'C4:1e3' is invalid: duration '1e3' is not a positive decimal number (e.g. 0.5 or 1.0)
+T-50  "C4:NaN" -> token 1 'C4:NaN' is invalid: duration 'NaN' is not a positive decimal number (e.g. 0.5 or 1.0)
+T-50  "C4:1..5" -> token 1 'C4:1..5' is invalid: duration '1..5' is not a positive decimal number (e.g. 0.5 or 1.0)
+T-50  "C4:100" -> token 1 'C4:100' is invalid: duration '100' is too long (maximum is 60.0)
+T-50  "" -> the phrase is empty (expected tokens like C4:1.0 E4:0.5)
+T-50  "   " -> the phrase is empty (expected tokens like C4:1.0 E4:0.5)
+
+=== SUMMARY ===
+T-01  [SUCCESS]  INSERT INTO EMPTY LIST SETS CURRENT
+T-02  [SUCCESS]  IN-PLACE MOVE (TAIL TO HEAD)
+T-03  [SUCCESS]  IN-PLACE MOVE (HEAD TO TAIL)
+T-04  [SUCCESS]  IN-PLACE MOVE (ADJACENT, FORWARD)
+T-05  [SUCCESS]  IN-PLACE MOVE (ADJACENT, BACKWARD)
+T-06  [SUCCESS]  IN-PLACE MOVE (HEAD TO ADJACENT POSITION)
+T-07  [SUCCESS]  IN-PLACE MOVE (TAIL TO ADJACENT POSITION)
+T-08  [SUCCESS]  IN-PLACE MOVE (MIDDLE, NON-ADJACENT FORWARD)
+T-09  [SUCCESS]  IN-PLACE MOVE (MIDDLE, NON-ADJACENT BACKWARD)
+T-10  [SUCCESS]  IN-PLACE MOVE ON SIZE 2 (TAIL TO HEAD)
+T-11  [SUCCESS]  IN-PLACE MOVE ON SIZE 2 (HEAD TO TAIL)
+T-12  [SUCCESS]  MOVE WITH SAME SOURCE AND TARGET (NO-OP)
+T-13  [SUCCESS]  MOVE ON SIZE 1
+T-14  [SUCCESS]  MOVE ON EMPTY LIST IS REJECTED
+T-15  [SUCCESS]  MOVE WITH INVALID INDICES IS REJECTED
+T-16  [SUCCESS]  MOVE ROUND TRIPS PRESERVE NODE IDENTITY
+T-17  [SUCCESS]  INSERTFIRST ON EMPTY AND NON-EMPTY LIST
+T-18  [SUCCESS]  INSERTAT(0) ON EMPTY LIST SETS CURRENT
+T-19  [SUCCESS]  INSERTAT FRONT, MIDDLE AND END (INDEX == SIZE)
+T-20  [SUCCESS]  INSERT AFTER CURRENT ON EMPTY LIST
+T-21  [SUCCESS]  INSERT AFTER CURRENT IN THE MIDDLE
+T-22  [SUCCESS]  INSERT AFTER CURRENT AT TAIL UPDATES TAIL
+T-23  [SUCCESS]  REPEAT CURRENT ON SIZE 1
+T-24  [SUCCESS]  REPEAT CURRENT FROM THE MIDDLE APPENDS TO END
+T-25  [SUCCESS]  REPEAT CURRENT ON EMPTY LIST
+T-26  [SUCCESS]  REMOVE CURRENT IN THE MIDDLE (CURRENT -> NEXT)
+T-27  [SUCCESS]  REMOVE CURRENT AT TAIL (CURRENT -> PREV)
+T-28  [SUCCESS]  REMOVE CURRENT AT HEAD (CURRENT -> NEXT)
+T-29  [SUCCESS]  REMOVE CURRENT ON SIZE 2 (TAIL)
+T-30  [SUCCESS]  REMOVE CURRENT ON SIZE 1 (LIST BECOMES EMPTY)
+T-31  [SUCCESS]  REMOVE CURRENT ON EMPTY LIST
+T-32  [SUCCESS]  REMOVEAT ON THE CURRENT NODE (MIDDLE -> NEXT)
+T-33  [SUCCESS]  REMOVEAT ON THE CURRENT NODE (TAIL -> PREV)
+T-34  [SUCCESS]  REMOVEAT ON OTHER NODES KEEPS CURRENT
+T-35  [SUCCESS]  REMOVEAT(0) ON SIZE 2 (HEAD)
+T-36  [SUCCESS]  REMOVEAT(0) ON EMPTY LIST
+T-37  [SUCCESS]  CLEAR RESETS HEAD, TAIL, SIZE AND CURRENT
+T-38  [SUCCESS]  GET OUT OF BOUNDS (NEGATIVE, == SIZE, > SIZE)
+T-39  [SUCCESS]  REMOVEAT OUT OF BOUNDS (NEGATIVE, == SIZE, > SIZE)
+T-40  [SUCCESS]  INSERTAT OUT OF BOUNDS (NEGATIVE, SIZE + 1, > SIZE + 1)
+T-41  [SUCCESS]  GET ON EMPTY LIST
+T-42  [SUCCESS]  GET WALKS FROM THE CLOSER END
+T-43  [SUCCESS]  NAVIGATION STOPS AT BOTH ENDS
+T-44  [SUCCESS]  NAVIGATION ON SIZE 1
+T-45  [SUCCESS]  NAVIGATION ON EMPTY LIST
+T-46  [SUCCESS]  PLAY ALL VISITS EVERY NODE HEAD TO TAIL
+T-47  [SUCCESS]  PLAY FROM CURRENT STARTS AT CURRENT
+T-48  [SUCCESS]  PLAY STOPS EARLY WHEN THE VISITOR RETURNS FALSE
+T-49  [SUCCESS]  PLAYBACK ON EMPTY LIST PLAYS NOTHING
+T-50  [SUCCESS]  INVALID PHRASES ARE REJECTED AND NOT INSERTED
+T-51  [SUCCESS]  VALID PHRASES (SHARPS, FLATS, RESTS, CHORDS) ARE ACCEPTED
+T-52  [SUCCESS]  DEMO COMPOSITION LOADS AND EVERY PHRASE IS VALID
+Total: 52 | Passed: 52 | Failed: 0
+ALL TESTS PASSED

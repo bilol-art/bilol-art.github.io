@@ -1,0 +1,1138 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CSDS 233 PA1 Report</title>
+<style>
+:root { --ink:#1a1a1a; --muted:#555; --rule:#c8c8c8; --soft:#f4f4f2; --accent:#1f4e79; }
+* { box-sizing: border-box; }
+html { background:#fff; }
+body { margin:0 auto; max-width:8.5in; padding:0.6in 0.7in; color:var(--ink); background:#fff;
+       font-family: Georgia, "Times New Roman", "Liberation Serif", serif; font-size:11pt; line-height:1.45; }
+h1, h2, h3 { font-family: "Segoe UI", "Helvetica Neue", Arial, "Liberation Sans", sans-serif; color:var(--accent);
+             line-height:1.2; break-after:avoid; page-break-after:avoid; }
+h1 { font-size:19pt; margin:0 0 0.25em; border-bottom:2px solid var(--accent); padding-bottom:0.2em; }
+h2 { font-size:14.5pt; margin:1.4em 0 0.5em; border-bottom:1px solid var(--rule); padding-bottom:0.15em; }
+h3 { font-size:12pt; margin:1.1em 0 0.4em; }
+p, li { orphans:3; widows:3; }
+code { font-family: Consolas, "Liberation Mono", "DejaVu Sans Mono", monospace; font-size:0.88em;
+       background:var(--soft); padding:0.05em 0.25em; border-radius:2px; }
+pre { background:var(--soft); border:1px solid #e1e1dc; border-left:3px solid var(--accent); padding:0.55em 0.7em;
+      font-size:7.6pt; line-height:1.35; white-space:pre-wrap; word-break:break-word; overflow-wrap:anywhere; }
+pre code { background:none; padding:0; font-size:inherit; }
+table { border-collapse:collapse; width:100%; margin:0.6em 0 1em; font-size:9.2pt; line-height:1.3; }
+th, td { border:1px solid var(--rule); padding:0.28em 0.45em; text-align:left; vertical-align:top; }
+th { background:#e9eef4; font-family: "Segoe UI", Arial, "Liberation Sans", sans-serif; }
+tr { break-inside:avoid; page-break-inside:avoid; }
+thead { display:table-header-group; }
+td code, th code { font-size:0.85em; padding:0; background:none; }
+.matrix table { font-size:7.1pt; table-layout:fixed; }
+.matrix th, .matrix td { padding:0.22em 0.3em; overflow-wrap:anywhere; word-break:break-word; }
+.matrix th:nth-child(1) { width:5.5%; } .matrix th:nth-child(2) { width:8%; }
+.matrix th:nth-child(3) { width:16%; } .matrix th:nth-child(4) { width:16%; }
+.matrix th:nth-child(5) { width:19%; } .matrix th:nth-child(6) { width:30%; } .matrix th:nth-child(7) { width:5.5%; }
+.matrix td:last-child { font-weight:bold; color:#1b6e2d; }
+mark { background:#fff1a8; padding:0 0.2em; }
+.nw { white-space:nowrap; }
+pre { break-inside:avoid; page-break-inside:avoid; }
+pre.long { break-inside:auto; page-break-inside:auto; }
+p:has(+ pre) { break-after:avoid; page-break-after:avoid; }
+.mutants th:nth-child(1) { width:8%; } .mutants th:nth-child(2) { width:43%; } .mutants th:nth-child(3) { width:16%; }
+.mutants th:nth-child(4) { width:8%; } .mutants th:nth-child(5) { width:25%; }
+.mutants table { table-layout:fixed; font-size:8.6pt; }
+@page { size: Letter; margin: 0.7in 0.65in 0.75in; }
+@media print {
+  body { max-width:none; padding:0; font-size:10.5pt; }
+  a { color:inherit; text-decoration:none; }
+}
+</style>
+</head>
+<body>
+<!--
+  To finish the report: replace every highlighted TODO (search for "TODO") with your own text,
+  then open this file in a browser and use Print -> Save as PDF (Letter, default margins,
+  "Headers and footers" off, "Background graphics" on) and save it as report.pdf.
+-->
+<h1>CSDS 233 Programming Assignment 1: Interactive Music Sequencer</h1>
+<p><strong>Name:</strong> <mark>TODO</mark> &nbsp;·&nbsp; <strong>Case ID:</strong> <mark>TODO</mark></p>
+<h2>1. Introduction</h2>
+<h3>1.1 The project</h3>
+<p>The sequencer stores a piece of music as a <strong>doubly linked list of phrases</strong>. Each node holds one phrase, a string of <code>PITCH:DURATION</code> tokens such as <code>C4:0.5 E4:0.5 G4:1.0</code> (chords are written <code>C4+E4+G4:1.0</code>, rests <code>R:0.5</code>). A console menu lets the user build and rearrange the composition (insert at the front, back, after the current phrase or at an index; repeat, remove and move phrases), move a "current" cursor through it, and play it with the provided <code>MidiPlayer</code>.</p>
+<p>All of the list code is my own. No <code>java.util</code> class is used: no collections, no <code>Scanner</code> (input is read with <code>BufferedReader</code>), and no array used as a substitute for a list. The only <code>java.util</code> import in the project is in the instructor's unmodified <code>MidiPlayer.java</code>.</p>
+<h3>1.2 Design</h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Responsibility</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DoublyLinkedList.java</code></td>
+<td>The required interface: <code>insertFirst</code>, <code>insertLast</code>, <code>insertAt</code>, <code>removeAt</code>, <code>get</code>, <code>size</code>, <code>isEmpty</code>.</td>
+</tr>
+<tr>
+<td><code>Node.java</code></td>
+<td>One node with explicit <code>data</code>, <code>prev</code> and <code>next</code> fields.</td>
+</tr>
+<tr>
+<td><code>PhraseList.java</code></td>
+<td><code>PhraseList&lt;E&gt; implements DoublyLinkedList&lt;E&gt;</code>. Keeps <code>head</code>, <code>tail</code>, <code>size</code> and <code>current</code>, and provides the cursor operations, <code>move</code>, traversal for playback, printing (<code>toString</code>, <code>status</code>, <code>backwardTrace</code>) and <code>checkInvariants</code>.</td>
+</tr>
+<tr>
+<td><code>PhraseValidator.java</code></td>
+<td>Checks every phrase before it is stored, so <code>MidiPlayer</code> never sees malformed input.</td>
+</tr>
+<tr>
+<td><code>Main.java</code></td>
+<td>The menu-driven driver.</td>
+</tr>
+<tr>
+<td><code>TestRunner.java</code></td>
+<td>Headless test harness (no JUnit, no sound).</td>
+</tr>
+<tr>
+<td><code>MidiPlayer.java</code></td>
+<td>Provided by the instructor, unchanged.</td>
+</tr>
+</tbody>
+</table>
+<p>Main design decisions:</p>
+<ul>
+<li><strong>All link changes go through four private helpers</strong>: <code>linkIntoEmpty</code>, <code>linkBefore</code>, <code>linkAfter</code> and <code>detach</code>. Each one updates <code>head</code>, <code>tail</code> and <code>size</code> itself, so the special cases (empty list, new head, new tail) are handled in one place. Every insertion, removal and move is built from these helpers, which keeps head, tail and size correct after every operation.</li>
+<li><strong>Index errors throw <code>IndexOutOfBoundsException</code> before anything is modified.</strong> The message names the index, the size and the valid range, e.g. <code>Index 3 is out of bounds for size 3 (valid range: 0..2)</code>. A rejected call therefore leaves the list exactly as it was; the tests check this, including that no node was allocated.</li>
+<li><strong>Lookups walk from the closer end.</strong> <code>get</code>, <code>removeAt</code> and <code>insertAt</code> find their node with <code>nodeAt(i)</code>, which starts at the head when <code>i &lt; size/2</code> and at the tail otherwise, so it takes at most about n/2 hops.</li>
+<li><strong>Traversal without <code>java.util.Iterator</code>.</strong> <code>PhraseList</code> declares its own callback interface <code>Visitor&lt;E&gt; { boolean visit(int index, E element); }</code>. The driver passes a lambda that prints <code>Playing node [i]: ...</code> and calls <code>player.play(...)</code>; returning <code>false</code> stops playback early, for example when no MIDI device is available.</li>
+<li><strong><code>null</code> elements are rejected</strong>, so a <code>null</code> return value always means "nothing", e.g. <code>removeCurrent()</code> on an empty list.</li>
+</ul>
+<h3>1.3 Why <code>current</code> lives in the list class</h3>
+<p>The cursor has a strong invariant: <strong><code>current == null</code> exactly when the list is empty, and otherwise <code>current</code> is a node that is in the list.</strong> Only the class that rewires links can keep that true, because the cursor has to be fixed <em>in the same step</em> that a node is unlinked. <code>unlink(node)</code> therefore moves the cursor first (to <code>next</code>, or to <code>prev</code> if the tail is being removed, or to <code>null</code> if it was the last node) and only then calls <code>detach</code>.</p>
+<p>If the driver kept the cursor instead, every operation could quietly break it. An index cursor shifts whenever something is inserted or removed in front of it, or moved past it. A node reference held by the driver would point at a detached node after a removal, and it would also expose the private <code>Node</code> class outside the list. Keeping <code>current</code> inside <code>PhraseList</code> also makes the cursor operations O(1): <code>insertAfterCurrent</code>, <code>removeCurrent</code>, <code>repeatCurrent</code>, <code>moveForward</code> and <code>moveBackward</code> only touch the current node's neighbours.</p>
+<p>Storing <code>current</code> as a <strong>node reference</strong> rather than an index is what makes <code>move</code> simple: the moved node is the same object before and after, so the cursor needs no update at all.</p>
+<h3>1.4 How <code>move(sourceIndex, targetIndex)</code> relinks nodes</h3>
+<p><code>targetIndex</code> is the final position of the moved node. The implementation never allocates a node and never assigns <code>data</code>; it only rewrites <code>prev</code>/<code>next</code> links:</p>
+<ol>
+<li><strong>Validate</strong> both indices against <code>0..size-1</code>. If either is invalid, throw <code>IndexOutOfBoundsException</code>; nothing has been touched yet. If <code>sourceIndex == targetIndex</code>, return <code>false</code> (no-op).</li>
+<li><strong>Find</strong> the node: <code>node = nodeAt(sourceIndex)</code>.</li>
+<li><strong>Detach</strong> it: <code>pred.next = succ</code> (or <code>head = succ</code>), <code>succ.prev = pred</code> (or <code>tail = pred</code>), clear the node's own links, <code>size--</code>. The other n−1 nodes now form a valid list on their own.</li>
+<li><strong>Re-attach</strong> it so that its index becomes <code>targetIndex</code> in the full list. If <code>targetIndex == size</code> (the shortened size), it becomes the new tail: <code>linkAfter(node, tail)</code>. Otherwise it goes directly in front of the node that is now at <code>targetIndex</code>: <code>linkBefore(node, nodeAt(targetIndex))</code>.</li>
+</ol>
+<p>Example, the assignment's case <code>move(2, 0)</code> on <code>[C4:1.0, E4:1.0, G4:2.0]</code>:</p>
+<pre><code>detach(G4)          C4 &lt;-&gt; E4                 tail = E4, E4.next = null
+linkBefore(G4, C4)  G4 &lt;-&gt; C4 &lt;-&gt; E4          G4.prev = null, G4.next = C4, C4.prev = G4, head = G4
+</code></pre>
+<p>Detaching first and then re-inserting means <strong>adjacent nodes, head/tail moves and size-2 lists need no special code</strong>. After the detach the neighbours are already linked to each other, and <code>linkBefore</code>/<code>linkAfter</code> already handle a new head or tail. (Swapping links in place would need separate code for adjacent nodes, which is a common source of bugs.) A size-1 list has only one valid pair, <code>(0, 0)</code>, which is the no-op. <code>current</code> is never touched, and because the node object is reused it still points at the same phrase, now possibly at a different index.</p>
+<h3>1.5 Phrase validation</h3>
+<p><code>MidiPlayer.play()</code> calls <code>Double.parseDouble</code> on every duration and does not catch the exception, so a phrase like <code>C4:abc</code> would throw <code>NumberFormatException</code> and crash the program halfway through playback. <code>PhraseValidator.validate()</code> therefore checks each phrase <strong>before</strong> it is stored. It scans the text character by character (no <code>split</code>, no regular expressions) against this grammar:</p>
+<pre><code>token    = pitches &quot;:&quot; duration
+pitches  = &quot;R&quot; | pitch { &quot;+&quot; pitch }            R = rest, &quot;+&quot; joins chord notes
+pitch    = letter [ &quot;#&quot; | &quot;b&quot; ] octave          C4, D#4, Eb5   (MIDI note must be &lt;= 127)
+letter   = &quot;A&quot; .. &quot;G&quot;         octave = &quot;0&quot; .. &quot;9&quot;
+duration = positive decimal, e.g. 1, 0.5, .25   (at most 60 seconds)
+</code></pre>
+<p>An invalid phrase is rejected with a message that names the token, e.g. <code>token 2 'E4:abc' is invalid: duration 'abc' is not a positive decimal number</code>, and nothing is inserted. Valid phrases are stored with their whitespace normalized. The 60-second limit is my own addition: <code>MidiPlayer</code> sleeps for <code>duration × 1000</code> ms, so a typo such as <code>C4:100000</code> would otherwise freeze the program for more than a day.</p>
+<h2>2. Complexity analysis</h2>
+<p>n = number of phrases in the list, i = index argument, L = length of a phrase in characters. "Best" and "Worst" differ only where noted.</p>
+<table>
+<thead>
+<tr>
+<th>Method</th>
+<th>Best</th>
+<th>Worst</th>
+<th>Justification</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>PhraseList()</code></td>
+<td>O(1)</td>
+<td>O(1)</td>
+<td>Sets four fields.</td>
+</tr>
+<tr>
+<td><code>insertFirst(e)</code></td>
+<td>O(1)</td>
+<td>O(1)</td>
+<td><code>head</code> is known; constant number of link updates.</td>
+</tr>
+<tr>
+<td><code>insertLast(e)</code></td>
+<td>O(1)</td>
+<td>O(1)</td>
+<td><code>tail</code> is kept, so no walk is needed.</td>
+</tr>
+<tr>
+<td><code>insertAt(i, e)</code></td>
+<td>O(1) at <code>i = 0</code> or <code>i = n</code></td>
+<td>O(n) for <code>i</code> in the middle</td>
+<td><code>i = n</code> is <code>insertLast</code>; otherwise <code>nodeAt(i)</code> walks min(i, n−1−i) ≤ n/2 hops, then linking is O(1).</td>
+</tr>
+<tr>
+<td><code>removeAt(i)</code></td>
+<td>O(1) at either end</td>
+<td>O(n) in the middle</td>
+<td>Same walk as <code>get</code>; unlinking is O(1).</td>
+</tr>
+<tr>
+<td><code>get(i)</code></td>
+<td>O(1) at either end</td>
+<td>O(n) in the middle</td>
+<td>Walks from the closer end: min(i, n−1−i) hops (test <span class="nw">T-42</span> measures this).</td>
+</tr>
+<tr>
+<td><code>size()</code>, <code>isEmpty()</code></td>
+<td>O(1)</td>
+<td>O(1)</td>
+<td><code>size</code> field.</td>
+</tr>
+<tr>
+<td><code>getCurrent()</code></td>
+<td>O(1)</td>
+<td>O(1)</td>
+<td>Reads <code>current.data</code>.</td>
+</tr>
+<tr>
+<td><code>getCurrentIndex()</code></td>
+<td>O(1) (current is head)</td>
+<td>O(n)</td>
+<td>Counts nodes from the head until it reaches <code>current</code>.</td>
+</tr>
+<tr>
+<td><code>insertAfterCurrent(e)</code></td>
+<td>O(1)</td>
+<td>O(1)</td>
+<td><code>linkAfter(node, current)</code>.</td>
+</tr>
+<tr>
+<td><code>repeatCurrent()</code></td>
+<td>O(1)</td>
+<td>O(1)</td>
+<td>New node with the same phrase, <code>linkAfter(node, tail)</code>.</td>
+</tr>
+<tr>
+<td><code>removeCurrent()</code></td>
+<td>O(1)</td>
+<td>O(1)</td>
+<td>Both neighbours are known; the cursor moves to one of them.</td>
+</tr>
+<tr>
+<td><code>moveForward()</code>, <code>moveBackward()</code></td>
+<td>O(1)</td>
+<td>O(1)</td>
+<td>Follow one link.</td>
+</tr>
+<tr>
+<td><code>move(s, t)</code></td>
+<td>O(1) when <code>s == t</code>, an index is invalid, or both indices are at the ends</td>
+<td>O(n)</td>
+<td>Up to two <code>nodeAt</code> walks of ≤ n/2 hops each; detaching and re-linking are O(1). No allocation.</td>
+</tr>
+<tr>
+<td><code>clear()</code></td>
+<td>O(1)</td>
+<td>O(1)</td>
+<td>Drops the references to head, tail and current; the garbage collector frees the nodes.</td>
+</tr>
+<tr>
+<td><code>traverseAll(v)</code></td>
+<td>O(k) if the visitor stops after k nodes</td>
+<td>O(n)</td>
+<td>One pass from head to tail (plus the visitor's own cost).</td>
+</tr>
+<tr>
+<td><code>traverseFromCurrent(v)</code></td>
+<td>O(1) on an empty list</td>
+<td>O(n)</td>
+<td><code>getCurrentIndex()</code> plus one pass from current to tail.</td>
+</tr>
+<tr>
+<td><code>toString()</code>, <code>backwardTrace()</code></td>
+<td>O(n)</td>
+<td>O(n)</td>
+<td>One full forward or backward pass (output length is proportional to the phrases' text).</td>
+</tr>
+<tr>
+<td><code>status()</code></td>
+<td>O(1)</td>
+<td>O(1)</td>
+<td>Reads <code>size</code>, <code>head</code>, <code>tail</code> and <code>current</code> only.</td>
+</tr>
+<tr>
+<td><code>checkInvariants()</code></td>
+<td>O(1) on an empty list</td>
+<td>O(n)</td>
+<td>One forward and one backward pass, each capped at size + 1 steps so it terminates even if the links contain a cycle.</td>
+</tr>
+<tr>
+<td><code>nodeAt(i)</code> (package-private)</td>
+<td>O(1)</td>
+<td>O(n)</td>
+<td>min(i, n−1−i) hops.</td>
+</tr>
+<tr>
+<td><code>PhraseValidator.validate(p)</code>, <code>isValid(p)</code>, <code>normalize(p)</code></td>
+<td>O(L)</td>
+<td>O(L)</td>
+<td>Each character is looked at a constant number of times.</td>
+</tr>
+<tr>
+<td><code>MidiPlayer.play(p)</code> (provided)</td>
+<td>O(T) work for T tokens</td>
+<td>O(T) work</td>
+<td>CPU work is tiny; <strong>wall-clock time equals the sum of the note durations</strong> because the player sleeps for each note.</td>
+</tr>
+</tbody>
+</table>
+<p>Driver operations (menu options):</p>
+<table>
+<thead>
+<tr>
+<th>Menu operation</th>
+<th>Cost</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Insert / remove / move / repeat / navigate</td>
+<td>cost of the list method above, + O(n)</td>
+<td>After every change the driver prints the list and status, which is one O(n) pass.</td>
+</tr>
+<tr>
+<td>Play all</td>
+<td>O(n) list work + O(total tokens)</td>
+<td>Wall time is the sum of all durations; for the demo composition that is 10 s, against microseconds for the traversal.</td>
+</tr>
+<tr>
+<td>Play from current</td>
+<td>O(n) list work + O(tokens played)</td>
+<td><code>getCurrentIndex()</code> for the printed index, then one pass to the tail.</td>
+</tr>
+<tr>
+<td>Play current</td>
+<td>O(n) list work + O(tokens in one phrase)</td>
+<td>O(n) only because the printed node index is computed by walking from the head.</td>
+</tr>
+<tr>
+<td>Show list</td>
+<td>O(n)</td>
+<td>List, status, backward trace and an indexed view, each one pass.</td>
+</tr>
+<tr>
+<td>Load demo composition</td>
+<td>O(1)</td>
+<td><code>clear()</code> plus five <code>insertLast</code> calls (a fixed number).</td>
+</tr>
+</tbody>
+</table>
+<h2>3. Testing</h2>
+<h3>3.1 Approach</h3>
+<p><code>TestRunner.java</code> is a plain Java program (no JUnit) that never creates a <code>MidiPlayer</code>, so it runs anywhere, including without a sound card: <code>javac *.java &amp;&amp; java TestRunner</code>. It prints every test in the required block format, writes the full output to <code>test_log.txt</code> and this matrix to <code>test_matrix.md</code>, and exits with status 1 if any test fails. The whole suite of 52 tests runs in well under a second.</p>
+<p>Each test builds its initial list, prints it, runs the operation(s) under test, and checks the result at several levels:</p>
+<ol>
+<li><strong>Contents and cursor.</strong> The full list and the current phrase are compared with the expected values after each operation.</li>
+<li><strong><code>checkInvariants()</code> after every single operation</strong>, including every <code>insertLast</code>/<code>moveForward</code> used to build the initial list and each of the 50 moves in <span class="nw">T-16</span>. It checks <code>head.prev == null</code>, <code>tail.next == null</code>, <code>a.next.prev == a</code> for every node, that the forward and backward node counts equal <code>size</code>, and that <code>current</code> is in the list.</li>
+<li><strong>Node identity for <code>move</code>.</strong> Before a move, the test stores the node objects themselves in a second list (a <code>PhraseList&lt;Node&lt;String&gt;&gt;</code>, so even the tests use no <code>java.util</code>). Afterwards it checks that each position holds exactly the expected original object, and that no node's <code>data</code> reference changed. This proves the nodes were relinked, not copied and not data-swapped.</li>
+<li><strong>No allocation.</strong> <code>Node</code> counts its instances (a package-private test hook), and every move test checks that the count did not change.</li>
+<li><strong>Invalid indices.</strong> For each invalid call the test expects an <code>IndexOutOfBoundsException</code> with a non-empty message, then checks that the list's text, status and node objects are unchanged and that no node was allocated. Every index method is tested with negative, <code>== size</code> and <code>&gt; size</code> arguments (for <code>insertAt</code>, where <code>size</code> is valid, with <code>size + 1</code> and larger).</li>
+<li><strong>Walk direction.</strong> <code>nodeAt</code> records how many links it followed. <span class="nw">T-42</span> checks that <code>get(i)</code> on 7 elements takes min(i, 6−i) hops.</li>
+<li><strong>Playback logic without sound.</strong> The play-all and play-from-current paths use the same <code>traverseAll</code>/<code>traverseFromCurrent</code> calls as the driver, with a recording visitor instead of the MIDI player.</li>
+<li><strong>Validation.</strong> 24 malformed phrases (including the <code>C4:abc</code> case that crashes <code>MidiPlayer</code>) must be rejected with a message that names the bad token, and 8 valid ones (sharps, flats, rests, chords, extra whitespace, range limits) must be accepted.</li>
+</ol>
+<p><strong>Do the tests catch real bugs?</strong> To check that, I injected 19 typical linked-list bugs into copies of the code, one at a time, and re-ran the suite. All 19 made at least one test fail:</p>
+<div class="mutants">
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>Injected bug</th>
+<th>File</th>
+<th>Result</th>
+<th>Failing tests</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="nw">M-01</span></td>
+<td>move swaps data instead of relinking</td>
+<td>PhraseList.java</td>
+<td>Caught</td>
+<td>11: <span class="nw">T-02</span>, <span class="nw">T-03</span>, <span class="nw">T-04</span>, <span class="nw">T-05</span>, <span class="nw">T-06</span>, <span class="nw">T-07</span> ...</td>
+</tr>
+<tr>
+<td><span class="nw">M-02</span></td>
+<td>move allocates a replacement node</td>
+<td>PhraseList.java</td>
+<td>Caught</td>
+<td>11: <span class="nw">T-02</span>, <span class="nw">T-03</span>, <span class="nw">T-04</span>, <span class="nw">T-05</span>, <span class="nw">T-06</span>, <span class="nw">T-07</span> ...</td>
+</tr>
+<tr>
+<td><span class="nw">M-03</span></td>
+<td>move forgets the new-tail case</td>
+<td>PhraseList.java</td>
+<td>Caught</td>
+<td>3: <span class="nw">T-03</span>, <span class="nw">T-11</span>, <span class="nw">T-16</span></td>
+</tr>
+<tr>
+<td><span class="nw">M-04</span></td>
+<td>removing tail current sets current to null</td>
+<td>PhraseList.java</td>
+<td>Caught</td>
+<td>3: <span class="nw">T-27</span>, <span class="nw">T-29</span>, <span class="nw">T-33</span></td>
+</tr>
+<tr>
+<td><span class="nw">M-05</span></td>
+<td>removeCurrent always moves to prev</td>
+<td>PhraseList.java</td>
+<td>Caught</td>
+<td>2: <span class="nw">T-26</span>, <span class="nw">T-32</span></td>
+</tr>
+<tr>
+<td><span class="nw">M-06</span></td>
+<td>nodeAt always walks from head</td>
+<td>PhraseList.java</td>
+<td>Caught</td>
+<td>1: <span class="nw">T-42</span></td>
+</tr>
+<tr>
+<td><span class="nw">M-07</span></td>
+<td>insertAt accepts size+1</td>
+<td>PhraseList.java</td>
+<td>Caught</td>
+<td>1: <span class="nw">T-40</span></td>
+</tr>
+<tr>
+<td><span class="nw">M-08</span></td>
+<td>linkAfter forgets succ.prev</td>
+<td>PhraseList.java</td>
+<td>Caught</td>
+<td>1: <span class="nw">T-21</span></td>
+</tr>
+<tr>
+<td><span class="nw">M-09</span></td>
+<td>detach forgets tail update</td>
+<td>PhraseList.java</td>
+<td>Caught</td>
+<td>9: <span class="nw">T-02</span>, <span class="nw">T-07</span>, <span class="nw">T-10</span>, <span class="nw">T-16</span>, <span class="nw">T-27</span>, <span class="nw">T-29</span> ...</td>
+</tr>
+<tr>
+<td><span class="nw">M-10</span></td>
+<td>moveForward ignores the tail boundary</td>
+<td>PhraseList.java</td>
+<td>Caught</td>
+<td>2: <span class="nw">T-43</span>, <span class="nw">T-44</span></td>
+</tr>
+<tr>
+<td><span class="nw">M-11</span></td>
+<td>removeCurrent on empty dereferences null</td>
+<td>PhraseList.java</td>
+<td>Caught</td>
+<td>1: <span class="nw">T-31</span></td>
+</tr>
+<tr>
+<td><span class="nw">M-12</span></td>
+<td>repeatCurrent inserts after current</td>
+<td>PhraseList.java</td>
+<td>Caught</td>
+<td>1: <span class="nw">T-24</span></td>
+</tr>
+<tr>
+<td><span class="nw">M-13</span></td>
+<td>traverseFromCurrent starts at head</td>
+<td>PhraseList.java</td>
+<td>Caught</td>
+<td>1: <span class="nw">T-47</span></td>
+</tr>
+<tr>
+<td><span class="nw">M-14</span></td>
+<td>insert into empty list leaves current null</td>
+<td>PhraseList.java</td>
+<td>Caught</td>
+<td>45: <span class="nw">T-01</span>, <span class="nw">T-02</span>, <span class="nw">T-03</span>, <span class="nw">T-04</span>, <span class="nw">T-05</span>, <span class="nw">T-06</span> ...</td>
+</tr>
+<tr>
+<td><span class="nw">M-15</span></td>
+<td>insertAfterCurrent moves current</td>
+<td>PhraseList.java</td>
+<td>Caught</td>
+<td>2: <span class="nw">T-21</span>, <span class="nw">T-22</span></td>
+</tr>
+<tr>
+<td><span class="nw">M-16</span></td>
+<td>element-index check accepts index == size (get, removeAt, move)</td>
+<td>PhraseList.java</td>
+<td>Caught</td>
+<td>7: <span class="nw">T-13</span>, <span class="nw">T-14</span>, <span class="nw">T-15</span>, <span class="nw">T-36</span>, <span class="nw">T-38</span>, <span class="nw">T-39</span> ...</td>
+</tr>
+<tr>
+<td><span class="nw">M-17</span></td>
+<td>validator accepts any duration</td>
+<td>PhraseValidator.java</td>
+<td>Caught</td>
+<td>1: <span class="nw">T-50</span></td>
+</tr>
+<tr>
+<td><span class="nw">M-18</span></td>
+<td>validator skips chord notes after the first</td>
+<td>PhraseValidator.java</td>
+<td>Caught</td>
+<td>1: <span class="nw">T-50</span></td>
+</tr>
+<tr>
+<td><span class="nw">M-19</span></td>
+<td>validator ignores MIDI range</td>
+<td>PhraseValidator.java</td>
+<td>Caught</td>
+<td>1: <span class="nw">T-50</span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>The driver was tested separately by piping scripted input into <code>java Main --echo</code> (the flag echoes each input line so the transcript is readable). The script loads the demo, moves (valid, same index, out of range), removes, enters an invalid phrase, a non-numeric index, an empty line and an unknown menu choice, and finally closes the input stream (EOF). The program never crashed; an excerpt is in 3.4. On a machine without a MIDI device, <code>MidiPlayer</code> cannot open a synthesizer and <code>play()</code> throws a <code>NullPointerException</code>. The driver catches that, prints a warning and keeps running.</p>
+<h3>3.2 Test matrix (from the actual run)</h3>
+<p>Notation: <code>[a, b, c] cur=x</code> is the list from head to tail and the current phrase. The <em>Expected</em> column was written in <code>TestRunner</code> before the run; the <em>Actual</em> column is generated from the list's state after the run, plus short notes that the test records while its checks run.</p>
+<div class="matrix">
+<table>
+<thead>
+<tr>
+<th>Test ID</th>
+<th>Category</th>
+<th>Initial State</th>
+<th>Action</th>
+<th>Expected</th>
+<th>Actual</th>
+<th>Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><span class="nw">T-01</span></td>
+<td>Insert</td>
+<td>[] cur=null</td>
+<td>insertLast("C4:1.0")</td>
+<td>[C4:1.0] cur=C4:1.0; head == tail == current</td>
+<td>[C4:1.0] cur=C4:1.0; head == tail == current (same node)</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-02</span></td>
+<td>Move</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=E4:1.0</td>
+<td>move(2, 0)</td>
+<td>[G4:2.0, C4:1.0, E4:1.0] cur=E4:1.0; same nodes, none allocated</td>
+<td>[G4:2.0, C4:1.0, E4:1.0] cur=E4:1.0; same 3 node objects now in original order 2 0 1; 0 nodes allocated; no data swapped; current is the same node</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-03</span></td>
+<td>Move</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=E4:1.0</td>
+<td>move(0, 2)</td>
+<td>[E4:1.0, G4:2.0, C4:1.0] cur=E4:1.0; same nodes, none allocated</td>
+<td>[E4:1.0, G4:2.0, C4:1.0] cur=E4:1.0; same 3 node objects now in original order 1 2 0; 0 nodes allocated; no data swapped; current is the same node</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-04</span></td>
+<td>Move</td>
+<td>[C4:1.0, D4:1.0, E4:1.0, F4:1.0] cur=E4:1.0</td>
+<td>move(1, 2)</td>
+<td>[C4:1.0, E4:1.0, D4:1.0, F4:1.0] cur=E4:1.0</td>
+<td>[C4:1.0, E4:1.0, D4:1.0, F4:1.0] cur=E4:1.0; same 4 node objects now in original order 0 2 1 3; 0 nodes allocated; no data swapped; current is the same node</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-05</span></td>
+<td>Move</td>
+<td>[C4:1.0, D4:1.0, E4:1.0, F4:1.0] cur=D4:1.0</td>
+<td>move(2, 1)</td>
+<td>[C4:1.0, E4:1.0, D4:1.0, F4:1.0] cur=D4:1.0</td>
+<td>[C4:1.0, E4:1.0, D4:1.0, F4:1.0] cur=D4:1.0; same 4 node objects now in original order 0 2 1 3; 0 nodes allocated; no data swapped; current is the same node</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-06</span></td>
+<td>Move</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=C4:1.0</td>
+<td>move(0, 1)</td>
+<td>[E4:1.0, C4:1.0, G4:2.0] cur=C4:1.0; head updated</td>
+<td>[E4:1.0, C4:1.0, G4:2.0] cur=C4:1.0; same 3 node objects now in original order 1 0 2; 0 nodes allocated; no data swapped; current is the same node</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-07</span></td>
+<td>Move</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=G4:2.0</td>
+<td>move(2, 1)</td>
+<td>[C4:1.0, G4:2.0, E4:1.0] cur=G4:2.0; tail updated</td>
+<td>[C4:1.0, G4:2.0, E4:1.0] cur=G4:2.0; same 3 node objects now in original order 0 2 1; 0 nodes allocated; no data swapped; current is the same node</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-08</span></td>
+<td>Move</td>
+<td>[C4:1.0, D4:1.0, E4:1.0, F4:1.0, G4:1.0] cur=D4:1.0</td>
+<td>move(1, 3)</td>
+<td>[C4:1.0, E4:1.0, F4:1.0, D4:1.0, G4:1.0] cur=D4:1.0 (now index 3)</td>
+<td>[C4:1.0, E4:1.0, F4:1.0, D4:1.0, G4:1.0] cur=D4:1.0; same 5 node objects now in original order 0 2 3 1 4; 0 nodes allocated; no data swapped; current is the same node; current followed the moved node to index 3</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-09</span></td>
+<td>Move</td>
+<td>[C4:1.0, D4:1.0, E4:1.0, F4:1.0, G4:1.0] cur=G4:1.0</td>
+<td>move(3, 1)</td>
+<td>[C4:1.0, F4:1.0, D4:1.0, E4:1.0, G4:1.0] cur=G4:1.0</td>
+<td>[C4:1.0, F4:1.0, D4:1.0, E4:1.0, G4:1.0] cur=G4:1.0; same 5 node objects now in original order 0 3 1 2 4; 0 nodes allocated; no data swapped; current is the same node</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-10</span></td>
+<td>Move</td>
+<td>[C4:1.0, E4:1.0] cur=C4:1.0</td>
+<td>move(1, 0)</td>
+<td>[E4:1.0, C4:1.0] cur=C4:1.0; head and tail swapped</td>
+<td>[E4:1.0, C4:1.0] cur=C4:1.0; same 2 node objects now in original order 1 0; 0 nodes allocated; no data swapped; current is the same node</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-11</span></td>
+<td>Move</td>
+<td>[C4:1.0, E4:1.0] cur=E4:1.0</td>
+<td>move(0, 1)</td>
+<td>[E4:1.0, C4:1.0] cur=E4:1.0; head and tail swapped</td>
+<td>[E4:1.0, C4:1.0] cur=E4:1.0; same 2 node objects now in original order 1 0; 0 nodes allocated; no data swapped; current is the same node</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-12</span></td>
+<td>Move</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=E4:1.0</td>
+<td>move(0, 0); move(1, 1); move(2, 2)</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=E4:1.0; each call returns false</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=E4:1.0; all 3 calls returned false; node order 0 1 2 unchanged</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-13</span></td>
+<td>Move</td>
+<td>[C4:1.0] cur=C4:1.0</td>
+<td>move(0, 0); move(0, 1); move(1, 0)</td>
+<td>[C4:1.0] cur=C4:1.0; move(0,0) is a no-op, the others throw IndexOutOfBoundsException</td>
+<td>[C4:1.0] cur=C4:1.0; move(0,0) returned false; 2 x IndexOutOfBoundsException, list unchanged</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-14</span></td>
+<td>Move</td>
+<td>[] cur=null</td>
+<td>move(0, 0); move(-1, 0)</td>
+<td>[] cur=null; IndexOutOfBoundsException, list unchanged</td>
+<td>[] cur=null; 2 x IndexOutOfBoundsException, list still empty</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-15</span></td>
+<td>Move</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=E4:1.0</td>
+<td>move(-1, 0); move(3, 0); move(4, 1); move(0, -1); move(0, 3); move(1, 9)</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=E4:1.0; 6 x IndexOutOfBoundsException, same nodes</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=E4:1.0; 6 x IndexOutOfBoundsException (negative, == size, &gt; size for source and target); list and nodes unchanged</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-16</span></td>
+<td>Move</td>
+<td>[C4:1.0, D4:1.0, E4:1.0, F4:1.0, G4:1.0] cur=E4:1.0</td>
+<td>move(i, j) then move(j, i) for every i, j in 0..4 (25 round trips)</td>
+<td>[C4:1.0, D4:1.0, E4:1.0, F4:1.0, G4:1.0] cur=E4:1.0; original nodes, 0 allocated</td>
+<td>[C4:1.0, D4:1.0, E4:1.0, F4:1.0, G4:1.0] cur=E4:1.0; 50 moves with invariants checked after each; moved node always landed at the target; 0 nodes allocated; final order 0 1 2 3 4</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-17</span></td>
+<td>Insert</td>
+<td>[] cur=null</td>
+<td>insertFirst("E4:1.0"); insertFirst("C4:1.0")</td>
+<td>[C4:1.0, E4:1.0] cur=E4:1.0</td>
+<td>[C4:1.0, E4:1.0] cur=E4:1.0; first insert became current; second insert left current alone</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-18</span></td>
+<td>Insert</td>
+<td>[] cur=null</td>
+<td>insertAt(0, "C4:1.0")</td>
+<td>[C4:1.0] cur=C4:1.0</td>
+<td>[C4:1.0] cur=C4:1.0; new node is head, tail and current</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-19</span></td>
+<td>Insert</td>
+<td>[D4:1.0, F4:1.0] cur=D4:1.0</td>
+<td>insertAt(0, "C4:1.0"); insertAt(2, "E4:1.0"); insertAt(4, "G4:1.0")</td>
+<td>[C4:1.0, D4:1.0, E4:1.0, F4:1.0, G4:1.0] cur=D4:1.0</td>
+<td>[C4:1.0, D4:1.0, E4:1.0, F4:1.0, G4:1.0] cur=D4:1.0; head, middle and tail inserts correct; current stayed on D4:1.0</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-20</span></td>
+<td>Cursor</td>
+<td>[] cur=null</td>
+<td>insertAfterCurrent("C4:1.0")</td>
+<td>[C4:1.0] cur=C4:1.0 (only node and current)</td>
+<td>[C4:1.0] cur=C4:1.0; new node is the only node and current</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-21</span></td>
+<td>Cursor</td>
+<td>[C4:1.0, G4:2.0] cur=C4:1.0</td>
+<td>insertAfterCurrent("E4:1.0")</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=C4:1.0</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=C4:1.0; inserted at index 1; current unchanged</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-22</span></td>
+<td>Cursor</td>
+<td>[C4:1.0, E4:1.0] cur=E4:1.0</td>
+<td>insertAfterCurrent("G4:2.0")</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=E4:1.0; Tail: G4:2.0</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=E4:1.0; tail is the new node</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-23</span></td>
+<td>Cursor</td>
+<td>[C4:1.0] cur=C4:1.0</td>
+<td>repeatCurrent()</td>
+<td>[C4:1.0, C4:1.0] cur=C4:1.0 (original head); copy is a new node</td>
+<td>[C4:1.0, C4:1.0] cur=C4:1.0; returned true; two distinct nodes; current still index 0</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-24</span></td>
+<td>Cursor</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=E4:1.0</td>
+<td>repeatCurrent()</td>
+<td>[C4:1.0, E4:1.0, G4:2.0, E4:1.0] cur=E4:1.0 (index 1)</td>
+<td>[C4:1.0, E4:1.0, G4:2.0, E4:1.0] cur=E4:1.0; copy appended as new tail; current still index 1</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-25</span></td>
+<td>Cursor</td>
+<td>[] cur=null</td>
+<td>repeatCurrent()</td>
+<td>[] cur=null; returns false</td>
+<td>[] cur=null; returned false, no exception</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-26</span></td>
+<td>Remove</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=E4:1.0</td>
+<td>removeCurrent()</td>
+<td>[C4:1.0, G4:2.0] cur=G4:2.0; returns E4:1.0</td>
+<td>[C4:1.0, G4:2.0] cur=G4:2.0; returned E4:1.0</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-27</span></td>
+<td>Remove</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=G4:2.0</td>
+<td>removeCurrent()</td>
+<td>[C4:1.0, E4:1.0] cur=E4:1.0; returns G4:2.0</td>
+<td>[C4:1.0, E4:1.0] cur=E4:1.0; returned G4:2.0</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-28</span></td>
+<td>Remove</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=C4:1.0</td>
+<td>removeCurrent()</td>
+<td>[E4:1.0, G4:2.0] cur=E4:1.0; returns C4:1.0</td>
+<td>[E4:1.0, G4:2.0] cur=E4:1.0; returned C4:1.0</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-29</span></td>
+<td>Remove</td>
+<td>[C4:1.0, E4:1.0] cur=E4:1.0</td>
+<td>removeCurrent()</td>
+<td>[C4:1.0] cur=C4:1.0; head == tail</td>
+<td>[C4:1.0] cur=C4:1.0; returned E4:1.0</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-30</span></td>
+<td>Remove</td>
+<td>[C4:1.0] cur=C4:1.0</td>
+<td>removeCurrent()</td>
+<td>[] cur=null; returns C4:1.0; head = tail = null</td>
+<td>[] cur=null; returned C4:1.0</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-31</span></td>
+<td>Remove</td>
+<td>[] cur=null</td>
+<td>removeCurrent()</td>
+<td>[] cur=null; returns null, no exception</td>
+<td>[] cur=null; returned null, no exception</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-32</span></td>
+<td>Remove</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=E4:1.0</td>
+<td>removeAt(1)</td>
+<td>[C4:1.0, G4:2.0] cur=G4:2.0</td>
+<td>[C4:1.0, G4:2.0] cur=G4:2.0; removeAt(1) returned E4:1.0</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-33</span></td>
+<td>Remove</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=G4:2.0</td>
+<td>removeAt(2)</td>
+<td>[C4:1.0, E4:1.0] cur=E4:1.0</td>
+<td>[C4:1.0, E4:1.0] cur=E4:1.0; removeAt(2) returned G4:2.0</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-34</span></td>
+<td>Remove</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=E4:1.0</td>
+<td>removeAt(0); removeAt(1)</td>
+<td>[E4:1.0] cur=E4:1.0</td>
+<td>[E4:1.0] cur=E4:1.0; removeAt(0) returned C4:1.0; removeAt(1) returned G4:2.0</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-35</span></td>
+<td>Remove</td>
+<td>[C4:1.0, E4:1.0] cur=C4:1.0</td>
+<td>removeAt(0)</td>
+<td>[E4:1.0] cur=E4:1.0; head == tail</td>
+<td>[E4:1.0] cur=E4:1.0; removeAt(0) returned C4:1.0; remaining node has prev == next == null</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-36</span></td>
+<td>Remove</td>
+<td>[] cur=null</td>
+<td>removeAt(0)</td>
+<td>[] cur=null; IndexOutOfBoundsException</td>
+<td>[] cur=null; IndexOutOfBoundsException, list still empty</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-37</span></td>
+<td>Remove</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=E4:1.0</td>
+<td>clear()</td>
+<td>[] cur=null; Size: 0</td>
+<td>[] cur=null; all fields reset</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-38</span></td>
+<td>Bounds</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=E4:1.0</td>
+<td>get(-1); get(3); get(4)</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=E4:1.0; 3 x IndexOutOfBoundsException</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=E4:1.0; 3 x IndexOutOfBoundsException, list unchanged</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-39</span></td>
+<td>Bounds</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=E4:1.0</td>
+<td>removeAt(-1); removeAt(3); removeAt(4)</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=E4:1.0; 3 x IndexOutOfBoundsException</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=E4:1.0; 3 x IndexOutOfBoundsException, list unchanged</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-40</span></td>
+<td>Bounds</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=E4:1.0</td>
+<td>insertAt(-1, "A4:1.0"); insertAt(4, "A4:1.0"); insertAt(10, "A4:1.0")</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=E4:1.0; 3 x IndexOutOfBoundsException, 0 nodes allocated</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=E4:1.0; 3 x IndexOutOfBoundsException, list unchanged, 0 nodes allocated (index == size is valid, see the INSERTAT FRONT, MIDDLE AND END test)</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-41</span></td>
+<td>Bounds</td>
+<td>[] cur=null</td>
+<td>get(0); get(-1); get(1)</td>
+<td>[] cur=null; 3 x IndexOutOfBoundsException</td>
+<td>[] cur=null; 3 x IndexOutOfBoundsException, no NullPointerException</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-42</span></td>
+<td>Access</td>
+<td>[C4:1.0, D4:1.0, E4:1.0, F4:1.0, G4:1.0, A4:1.0, B4:1.0] cur=C4:1.0</td>
+<td>get(i) for i = 0..6</td>
+<td>C4..B4 returned in order; link hops 0 1 2 3 2 1 0</td>
+<td>[C4:1.0, D4:1.0, E4:1.0, F4:1.0, G4:1.0, A4:1.0, B4:1.0] cur=C4:1.0; all 7 values correct; link hops 0 1 2 3 2 1 0 (never more than 3 for size 7)</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-43</span></td>
+<td>Navigation</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=C4:1.0</td>
+<td>moveBackward(); moveForward(); moveForward(); moveForward(); moveBackward()</td>
+<td>returns false, true, true, false, true; cur=E4:1.0</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=E4:1.0; returned false, true, true, false, true; stayed put at both ends</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-44</span></td>
+<td>Navigation</td>
+<td>[C4:1.0] cur=C4:1.0</td>
+<td>moveForward(); moveBackward()</td>
+<td>both return false; cur=C4:1.0</td>
+<td>[C4:1.0] cur=C4:1.0; returned false, false</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-45</span></td>
+<td>Navigation</td>
+<td>[] cur=null</td>
+<td>moveForward(); moveBackward(); getCurrent(); getCurrentIndex()</td>
+<td>false, false, null, -1; no exception</td>
+<td>[] cur=null; returned false, false, getCurrent() = null, getCurrentIndex() = -1</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-46</span></td>
+<td>Playback</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=E4:1.0</td>
+<td>traverseAll(recorder)</td>
+<td>3 visited: [0] C4:1.0 -&gt; [1] E4:1.0 -&gt; [2] G4:2.0; cur unchanged</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=E4:1.0; 3 visited: [0] C4:1.0 -&gt; [1] E4:1.0 -&gt; [2] G4:2.0</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-47</span></td>
+<td>Playback</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=E4:1.0</td>
+<td>traverseFromCurrent(recorder)</td>
+<td>2 visited: [1] E4:1.0 -&gt; [2] G4:2.0</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=E4:1.0; 2 visited: [1] E4:1.0 -&gt; [2] G4:2.0</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-48</span></td>
+<td>Playback</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=C4:1.0</td>
+<td>traverseAll(recorder that returns false at index 1)</td>
+<td>2 visited: [0] C4:1.0 -&gt; [1] E4:1.0</td>
+<td>[C4:1.0, E4:1.0, G4:2.0] cur=C4:1.0; 2 visited: [0] C4:1.0 -&gt; [1] E4:1.0 (the driver stops like this if MIDI playback fails)</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-49</span></td>
+<td>Playback</td>
+<td>[] cur=null</td>
+<td>traverseAll(recorder); traverseFromCurrent(recorder); getCurrent()</td>
+<td>0 visited by both; current null, so play current has nothing to play</td>
+<td>[] cur=null; play all: 0 visited: (none); play from current: 0 visited: (none); getCurrent() = null</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-50</span></td>
+<td>Validation</td>
+<td>[C4:1.0] cur=C4:1.0</td>
+<td>for 24 malformed phrases: insertLast(p) only if PhraseValidator.validate(p) == null</td>
+<td>[C4:1.0] cur=C4:1.0; 24/24 rejected, each message names the bad token</td>
+<td>[C4:1.0] cur=C4:1.0; 24/24 rejected, each message names the bad token (listed before the summary); list unchanged</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-51</span></td>
+<td>Validation</td>
+<td>[] cur=null</td>
+<td>for 8 valid phrases: insertLast(normalize(p)) after validate(p) == null</td>
+<td>[C4:1.0, D#4:0.5, Eb5:0.25, R:0.5, C4+E4+G4:1.0, A4:0.5 Bb3:.5, G9:1, Cb0:60] cur=C4:1.0</td>
+<td>[C4:1.0, D#4:0.5, Eb5:0.25, R:0.5, C4+E4+G4:1.0, A4:0.5 Bb3:.5, G9:1, Cb0:60] cur=C4:1.0; 8/8 accepted; extra whitespace normalized</td>
+<td>PASS</td>
+</tr>
+<tr>
+<td><span class="nw">T-52</span></td>
+<td>Validation</td>
+<td>[C4:1.0] cur=C4:1.0</td>
+<td>Main.loadDemoComposition(list)</td>
+<td>5 valid phrases; old content replaced; cur = first phrase (head)</td>
+<td>[C4:0.5 C4:0.5 G4:0.5 G4:0.5, A4:0.5 A4:0.5 G4:1.0, F4:0.5 F4:0.5 E4:0.5 E4:0.5, D4:0.5 D4:0.5 C4:1.0, F4+A4+C5:0.5 G4+B4+D5:0.5 C4+E4+G4:1.0] cur=C4:0.5 C4:0.5 G4:0.5 G4:0.5; 5 phrases, all pass PhraseValidator; current = head</td>
+<td>PASS</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p><strong>Result: 52 of 52 tests passed, 0 failed</strong> (Java 21.0.11).</p>
+<h3>3.3 Excerpts from <code>test_log.txt</code></h3>
+<p>The assignment's example, an in-place move from tail to head:</p>
+<pre><code>=== RUNNING TEST T-02: IN-PLACE MOVE (TAIL TO HEAD) ===
+Initial List: [ C4:1.0 ] &lt;-&gt; [ E4:1.0 ] &lt;-&gt; [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: E4:1.0
+Executing: move(2, 0)
+Result List: [ G4:2.0 ] &lt;-&gt; [ C4:1.0 ] &lt;-&gt; [ E4:1.0 ]
+Size: 3 | Head: G4:2.0 | Tail: E4:1.0 | Current: E4:1.0
+Check Backwards Link (Tail to Head): E4:1.0 -&gt; C4:1.0 -&gt; G4:2.0 -&gt; null
+[SUCCESS]
+</code></pre>
+<p>Invalid indices are rejected and the list is left unchanged:</p>
+<pre><code>=== RUNNING TEST T-15: MOVE WITH INVALID INDICES IS REJECTED ===
+Initial List: [ C4:1.0 ] &lt;-&gt; [ E4:1.0 ] &lt;-&gt; [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: E4:1.0
+Executing: move(-1, 0); move(3, 0); move(4, 1); move(0, -1); move(0, 3); move(1, 9)
+Result List: [ C4:1.0 ] &lt;-&gt; [ E4:1.0 ] &lt;-&gt; [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: E4:1.0
+Check Backwards Link (Tail to Head): G4:2.0 -&gt; E4:1.0 -&gt; C4:1.0 -&gt; null
+[SUCCESS]
+</code></pre>
+<p>Removing the current node at the tail moves the cursor back; removing the last node empties the list:</p>
+<pre><code>=== RUNNING TEST T-27: REMOVE CURRENT AT TAIL (CURRENT -&gt; PREV) ===
+Initial List: [ C4:1.0 ] &lt;-&gt; [ E4:1.0 ] &lt;-&gt; [ G4:2.0 ]
+Size: 3 | Head: C4:1.0 | Tail: G4:2.0 | Current: G4:2.0
+Executing: removeCurrent()
+Result List: [ C4:1.0 ] &lt;-&gt; [ E4:1.0 ]
+Size: 2 | Head: C4:1.0 | Tail: E4:1.0 | Current: E4:1.0
+Check Backwards Link (Tail to Head): E4:1.0 -&gt; C4:1.0 -&gt; null
+[SUCCESS]
+
+=== RUNNING TEST T-30: REMOVE CURRENT ON SIZE 1 (LIST BECOMES EMPTY) ===
+Initial List: [ C4:1.0 ]
+Size: 1 | Head: C4:1.0 | Tail: C4:1.0 | Current: C4:1.0
+Executing: removeCurrent()
+Result List: (empty)
+Size: 0 | Head: null | Tail: null | Current: null
+Check Backwards Link (Tail to Head): null
+[SUCCESS]
+</code></pre>
+<p><code>get</code> walks from the closer end:</p>
+<pre><code>=== RUNNING TEST T-42: GET WALKS FROM THE CLOSER END ===
+Initial List: [ C4:1.0 ] &lt;-&gt; [ D4:1.0 ] &lt;-&gt; [ E4:1.0 ] &lt;-&gt; [ F4:1.0 ] &lt;-&gt; [ G4:1.0 ] &lt;-&gt; [ A4:1.0 ] &lt;-&gt; [ B4:1.0 ]
+Size: 7 | Head: C4:1.0 | Tail: B4:1.0 | Current: C4:1.0
+Executing: get(i) for i = 0..6
+Result List: [ C4:1.0 ] &lt;-&gt; [ D4:1.0 ] &lt;-&gt; [ E4:1.0 ] &lt;-&gt; [ F4:1.0 ] &lt;-&gt; [ G4:1.0 ] &lt;-&gt; [ A4:1.0 ] &lt;-&gt; [ B4:1.0 ]
+Size: 7 | Head: C4:1.0 | Tail: B4:1.0 | Current: C4:1.0
+Check Backwards Link (Tail to Head): B4:1.0 -&gt; A4:1.0 -&gt; G4:1.0 -&gt; F4:1.0 -&gt; E4:1.0 -&gt; D4:1.0 -&gt; C4:1.0 -&gt; null
+[SUCCESS]
+</code></pre>
+<p>Exception and validator messages recorded during the run (selection):</p>
+<pre><code>T-14  move(0, 0) -&gt; IndexOutOfBoundsException: Source index 0 is out of bounds: the list is empty
+T-15  move(3, 0) -&gt; IndexOutOfBoundsException: Source index 3 is out of bounds for size 3 (valid range: 0..2)
+T-15  move(0, -1) -&gt; IndexOutOfBoundsException: Target index -1 is out of bounds for size 3 (valid range: 0..2)
+T-36  removeAt(0) -&gt; IndexOutOfBoundsException: Index 0 is out of bounds: the list is empty
+T-38  get(3) -&gt; IndexOutOfBoundsException: Index 3 is out of bounds for size 3 (valid range: 0..2)
+T-40  insertAt(4, A4:1.0) -&gt; IndexOutOfBoundsException: Insert index 4 is out of bounds for size 3 (valid range: 0..3)
+T-50  &quot;C4:abc&quot; -&gt; token 1 'C4:abc' is invalid: duration 'abc' is not a positive decimal number (e.g. 0.5 or 1.0)
+T-50  &quot;C4:1.0 E4:abc G4:1.0&quot; -&gt; token 2 'E4:abc' is invalid: duration 'abc' is not a positive decimal number (e.g. 0.5 or 1.0)
+T-50  &quot;H4:1.0&quot; -&gt; token 1 'H4:1.0' is invalid: pitch 'H4' must start with a note letter A-G (or be R for a rest)
+T-50  &quot;C4+R:1.0&quot; -&gt; token 1 'C4+R:1.0' is invalid: a rest (R) cannot be part of a chord
+T-50  &quot;G#9:1.0&quot; -&gt; token 1 'G#9:1.0' is invalid: pitch 'G#9' is above the MIDI range (highest note is G9)
+T-50  &quot;C4&quot; -&gt; token 1 'C4' is invalid: missing ':' between pitch and duration (expected PITCH:DURATION, e.g. C4:1.0)
+T-50  &quot;C4:1e3&quot; -&gt; token 1 'C4:1e3' is invalid: duration '1e3' is not a positive decimal number (e.g. 0.5 or 1.0)
+T-50  &quot;C4:100&quot; -&gt; token 1 'C4:100' is invalid: duration '100' is too long (maximum is 60.0)
+T-50  &quot;&quot; -&gt; the phrase is empty (expected tokens like C4:1.0 E4:0.5)
+</code></pre>
+<p>Summary at the end of the log (the middle of the per-test list is shortened here; the full list is in the matrix above):</p>
+<pre><code>=== SUMMARY ===
+T-01  [SUCCESS]  INSERT INTO EMPTY LIST SETS CURRENT
+T-02  [SUCCESS]  IN-PLACE MOVE (TAIL TO HEAD)
+T-03  [SUCCESS]  IN-PLACE MOVE (HEAD TO TAIL)
+T-04  [SUCCESS]  IN-PLACE MOVE (ADJACENT, FORWARD)
+[... 45 more lines (T-05 to T-49), all [SUCCESS] ...]
+T-50  [SUCCESS]  INVALID PHRASES ARE REJECTED AND NOT INSERTED
+T-51  [SUCCESS]  VALID PHRASES (SHARPS, FLATS, RESTS, CHORDS) ARE ACCEPTED
+T-52  [SUCCESS]  DEMO COMPOSITION LOADS AND EVERY PHRASE IS VALID
+Total: 52 | Passed: 52 | Failed: 0
+ALL TESTS PASSED
+</code></pre>
+<h3>3.4 Driver smoke test (excerpt)</h3>
+<p>Scripted input piped into <code>java Main --echo</code>; the menu is omitted after the first prompt.</p>
+<pre class="long"><code>Choose an option [0-15]: 15
+Loaded the demo composition: 5 phrases.
+List: [ C4:0.5 C4:0.5 G4:0.5 G4:0.5 ] &lt;-&gt; [ A4:0.5 A4:0.5 G4:1.0 ] &lt;-&gt; [ F4:0.5 F4:0.5 E4:0.5 E4:0.5 ] &lt;-&gt; [ D4:0.5 D4:0.5 C4:1.0 ] &lt;-&gt; [ F4+A4+C5:0.5 G4+B4+D5:0.5 C4+E4+G4:1.0 ]
+Size: 5 | Head: C4:0.5 C4:0.5 G4:0.5 G4:0.5 | Tail: F4+A4+C5:0.5 G4+B4+D5:0.5 C4+E4+G4:1.0 | Current: C4:0.5 C4:0.5 G4:0.5 G4:0.5
+Choose an option [0-15]: 8
+Source index (0..4): 4
+Target index, i.e. final position (0..4): 0
+Moved the node at index 4 to index 0 (links rewired, nothing copied).
+List: [ F4+A4+C5:0.5 G4+B4+D5:0.5 C4+E4+G4:1.0 ] &lt;-&gt; [ C4:0.5 C4:0.5 G4:0.5 G4:0.5 ] &lt;-&gt; [ A4:0.5 A4:0.5 G4:1.0 ] &lt;-&gt; [ F4:0.5 F4:0.5 E4:0.5 E4:0.5 ] &lt;-&gt; [ D4:0.5 D4:0.5 C4:1.0 ]
+Size: 5 | Head: F4+A4+C5:0.5 G4+B4+D5:0.5 C4+E4+G4:1.0 | Tail: D4:0.5 D4:0.5 C4:1.0 | Current: C4:0.5 C4:0.5 G4:0.5 G4:0.5
+Choose an option [0-15]: 8
+Source index (0..4): 1
+Target index, i.e. final position (0..4): 1
+Source and target are the same: nothing to move.
+List: [ F4+A4+C5:0.5 G4+B4+D5:0.5 C4+E4+G4:1.0 ] &lt;-&gt; [ C4:0.5 C4:0.5 G4:0.5 G4:0.5 ] &lt;-&gt; [ A4:0.5 A4:0.5 G4:1.0 ] &lt;-&gt; [ F4:0.5 F4:0.5 E4:0.5 E4:0.5 ] &lt;-&gt; [ D4:0.5 D4:0.5 C4:1.0 ]
+Size: 5 | Head: F4+A4+C5:0.5 G4+B4+D5:0.5 C4+E4+G4:1.0 | Tail: D4:0.5 D4:0.5 C4:1.0 | Current: C4:0.5 C4:0.5 G4:0.5 G4:0.5
+Choose an option [0-15]: 8
+Source index (0..4): 0
+Target index, i.e. final position (0..4): 9
+[!] Warning: Target index 9 is out of bounds for size 5 (valid range: 0..4). The list was not changed.
+Choose an option [0-15]: 6
+Removed the current phrase: C4:0.5 C4:0.5 G4:0.5 G4:0.5
+List: [ F4+A4+C5:0.5 G4+B4+D5:0.5 C4+E4+G4:1.0 ] &lt;-&gt; [ A4:0.5 A4:0.5 G4:1.0 ] &lt;-&gt; [ F4:0.5 F4:0.5 E4:0.5 E4:0.5 ] &lt;-&gt; [ D4:0.5 D4:0.5 C4:1.0 ]
+Size: 4 | Head: F4+A4+C5:0.5 G4+B4+D5:0.5 C4+E4+G4:1.0 | Tail: D4:0.5 D4:0.5 C4:1.0 | Current: A4:0.5 A4:0.5 G4:1.0
+Choose an option [0-15]: 7
+Index to remove (0..3): 2
+Removed the phrase at index 2: F4:0.5 F4:0.5 E4:0.5 E4:0.5
+List: [ F4+A4+C5:0.5 G4+B4+D5:0.5 C4+E4+G4:1.0 ] &lt;-&gt; [ A4:0.5 A4:0.5 G4:1.0 ] &lt;-&gt; [ D4:0.5 D4:0.5 C4:1.0 ]
+Size: 3 | Head: F4+A4+C5:0.5 G4+B4+D5:0.5 C4+E4+G4:1.0 | Tail: D4:0.5 D4:0.5 C4:1.0 | Current: A4:0.5 A4:0.5 G4:1.0
+Choose an option [0-15]: 1
+Enter phrase (e.g. C4:0.5 E4:0.5 G4:1.0): C4:abc
+[!] Warning: Phrase rejected, token 1 'C4:abc' is invalid: duration 'abc' is not a positive decimal number (e.g. 0.5 or 1.0). Nothing was inserted.
+Choose an option [0-15]: 2
+Enter phrase (e.g. C4:0.5 E4:0.5 G4:1.0): E4:0.5   G4:0.5
+Inserted at the back: E4:0.5 G4:0.5
+List: [ F4+A4+C5:0.5 G4+B4+D5:0.5 C4+E4+G4:1.0 ] &lt;-&gt; [ A4:0.5 A4:0.5 G4:1.0 ] &lt;-&gt; [ D4:0.5 D4:0.5 C4:1.0 ] &lt;-&gt; [ E4:0.5 G4:0.5 ]
+Size: 4 | Head: F4+A4+C5:0.5 G4+B4+D5:0.5 C4+E4+G4:1.0 | Tail: E4:0.5 G4:0.5 | Current: A4:0.5 A4:0.5 G4:1.0
+Choose an option [0-15]: 7
+Index to remove (0..3): abc
+[!] Warning: 'abc' is not a valid whole number. Operation cancelled.
+Choose an option [0-15]: 13
+Current moved backward.
+List: [ F4+A4+C5:0.5 G4+B4+D5:0.5 C4+E4+G4:1.0 ] &lt;-&gt; [ A4:0.5 A4:0.5 G4:1.0 ] &lt;-&gt; [ D4:0.5 D4:0.5 C4:1.0 ] &lt;-&gt; [ E4:0.5 G4:0.5 ]
+Size: 4 | Head: F4+A4+C5:0.5 G4+B4+D5:0.5 C4+E4+G4:1.0 | Tail: E4:0.5 G4:0.5 | Current: F4+A4+C5:0.5 G4+B4+D5:0.5 C4+E4+G4:1.0
+Choose an option [0-15]: 13
+[!] Warning: Already at the first phrase (head): cannot move backward.
+Size: 4 | Head: F4+A4+C5:0.5 G4+B4+D5:0.5 C4+E4+G4:1.0 | Tail: E4:0.5 G4:0.5 | Current: F4+A4+C5:0.5 G4+B4+D5:0.5 C4+E4+G4:1.0
+Choose an option [0-15]: 
+[!] Warning: Please type a menu number (0-15).
+Choose an option [0-15]: xyz
+[!] Warning: 'xyz' is not a menu number. Please type 0-15.
+Choose an option [0-15]: 
+Input closed (end of file). Exiting the sequencer...
+MIDI system closed. Goodbye!
+</code></pre>
+<h2>4. Reflection</h2>
+<h3>4.1 Most interesting</h3>
+<!-- Replace the highlighted TODO with your own paragraph(s). -->
+<p><mark>TODO: write yourself</mark></p>
+<h3>4.2 Most challenging</h3>
+<!-- Replace the highlighted TODO with your own paragraph(s). -->
+<p><mark>TODO: write yourself</mark></p>
+<h3>4.3 Feedback</h3>
+<!-- Replace the highlighted TODO with your own paragraph(s). -->
+<p><mark>TODO: write yourself</mark></p>
+<h2>5. Possible extensions</h2>
+<ol>
+<li><strong>Tempo (BPM).</strong> Store durations in beats instead of seconds and add a global tempo; a beat lasts 60 / BPM seconds. Because <code>MidiPlayer</code> must not change, the driver would rewrite each token's duration (<code>beats × 60 / BPM</code>) before calling <code>play()</code>. Changing the tempo would then be O(1) and would not touch the stored phrases.</li>
+<li><strong>Transpose.</strong> Shift the current phrase, or the whole list, by k semitones. The validator already computes each note's MIDI number, so transposing means parsing each pitch, adding k, checking 0..127 and spelling the note again (e.g. with sharps). Cost O(total tokens), done in one traversal.</li>
+<li><strong>Undo / redo.</strong> Keep two stacks of edit commands, built on the same doubly linked list. Every edit has a cheap inverse: <code>insertAt(i, p)</code> ↔ <code>removeAt(i)</code>, <code>removeCurrent()</code> ↔ <code>insertAt(oldIndex, phrase)</code> plus restoring the cursor, and <code>move(s, t)</code> ↔ <code>move(t, s)</code> (test <span class="nw">T-16</span> already shows that this round trip restores the exact same nodes).</li>
+<li><strong>Save / load.</strong> Write one phrase per line to a text file with <code>BufferedWriter</code>, and read it back with <code>BufferedReader</code>, running every line through <code>PhraseValidator</code> and reporting bad lines by line number instead of loading them. This is O(n + total characters) and would let users keep their compositions between runs.</li>
+<li><strong>Instrument change.</strong> The player always uses program 0 (grand piano). An extension could store an instrument number per phrase (e.g. a prefix <code>@40</code> for violin) and call <code>MidiChannel.programChange(n)</code> before playing that node. Since <code>MidiPlayer</code> is fixed for this assignment, this would need a new player class.</li>
+</ol>
+</body>
+</html>
